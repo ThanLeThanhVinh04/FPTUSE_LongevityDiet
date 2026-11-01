@@ -3,7 +3,7 @@
 **Owner:** Thành viên 3  
 **Reviewer:** Thành viên 1  
 **Branch:** `feature/w1-t3-plan-log-window`  
-**Status:** Not Started
+**Status:** Done
 
 ## Architecture alignment (ADR-005)
 

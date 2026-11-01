@@ -6,6 +6,8 @@ using LongevityDiet.Domain.Entities;
 using LongevityDiet.Repositories;
 using LongevityDiet.Repositories.Repositories;
 using LongevityDiet.Services.Identity;
+using LongevityDiet.Services.Planning;
+using LongevityDiet.Services.Tracking;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -54,8 +56,15 @@ try
 
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+    builder.Services.AddScoped<IMealPlanRepository, MealPlanRepository>();
+    builder.Services.AddScoped<IMealLogRepository, MealLogRepository>();
+    builder.Services.AddScoped<IEatingWindowRepository, EatingWindowRepository>();
+    builder.Services.AddScoped<IPlanningInputProvider, PlanningCatalogSnapshotProvider>();
+    builder.Services.AddScoped<ITrackingUserScheduleProvider, TrackingUserScheduleProvider>();
     builder.Services.AddScoped<AuthenticationService>();
     builder.Services.AddScoped<ProfileService>();
+    builder.Services.AddScoped<MealPlanningService>();
+    builder.Services.AddScoped<MealTrackingService>();
     builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
     builder.Services.AddScoped<IAccessTokenProvider, JwtAccessTokenProvider>();
     builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
