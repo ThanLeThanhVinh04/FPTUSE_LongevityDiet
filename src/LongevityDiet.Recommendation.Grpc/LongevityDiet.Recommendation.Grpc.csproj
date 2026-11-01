@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.64.0" />
+    <Protobuf Include="Protos\recommendation.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,7 +3,7 @@
 **Owner:** Thành viên 3
 **Reviewer:** Thành viên 1
 **Branch:** `feature/w2-t3-recommendation-v2`
-**Status:** Planned
+**Status:** Done
 
 ## Architecture alignment (ADR-005)
 

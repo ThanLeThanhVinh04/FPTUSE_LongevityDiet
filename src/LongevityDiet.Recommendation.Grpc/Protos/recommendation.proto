@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+option csharp_namespace = "LongevityDiet.Recommendation.Grpc.Protos";
+
+package longevitydiet.recommendation.v2;
+
+service RecommendationProtoService {
+  rpc RankMeals (RankMealsProtoRequest) returns (RankMealsProtoResponse);
+}
+
+message RankMealsProtoRequest {
+  string contract_version = 1;
+  string rule_set_version = 2;
+  string weight_profile_version = 3;
+  string target_slot = 4;
+  string dietary_pattern = 5;
+  int32 user_age_years = 6;
+  string preferred_cuisine = 7;
+  repeated string allergies = 8;
+  repeated string explicit_exclusions = 9;
+  repeated string disliked_tokens = 10;
+  repeated string preferred_tokens = 11;
+  string current_candidate_code = 12;
+  repeated CandidateMealProtoInput candidates = 13;
+}
+
+message CandidateMealProtoInput {
+  string candidate_code = 1;
+  string title = 2;
+  string description = 3;
+  string category = 4;
+  string cuisine = 5;
+  repeated string supported_slots = 6;
+  double serving_size = 7;
+  string serving_unit = 8;
+  int32 calories_kcal = 9;
+  double protein_grams = 10;
+  double carbs_grams = 11;
+  double fat_grams = 12;
+  double saturated_fat_grams = 13;
+  double sugar_grams = 14;
+  double fiber_grams = 15;
+  bool is_plant_based = 16;
+  bool has_legumes = 17;
+  bool has_whole_grains = 18;
+  bool contains_fish = 19;
+  repeated string allergens = 20;
+  repeated string ingredients = 21;
+  bool is_active = 22;
+  bool has_safety_gate_violation = 23;
+}
+
+message ScoreComponentProto {
+  string component_code = 1;
+  string label = 2;
+  double normalized_value = 3;
+  double weight = 4;
+  double weighted_delta = 5;
+  bool is_penalty = 6;
+}
+
+message ReasonDetailProto {
+  string reason_code = 1;
+  string title = 2;
+  string explanation = 3;
+}
+
+message RankedCandidateProto {
+  int32 rank = 1;
+  string candidate_code = 2;
+  string title = 3;
+  string description = 4;
+  string cuisine = 5;
+  double serving_size = 6;
+  string serving_unit = 7;
+  int32 calories_kcal = 8;
+  double protein_grams = 9;
+  double carbs_grams = 10;
+  double fat_grams = 11;
+  double fiber_grams = 12;
+  bool is_plant_based = 13;
+  bool has_legumes = 14;
+  bool has_whole_grains = 15;
+  bool contains_fish = 16;
+  repeated string allergens = 17;
+  repeated string ingredients = 18;
+  double final_score = 19;
+  bool is_disliked = 20;
+  bool is_preferred = 21;
+  repeated ScoreComponentProto score_components = 22;
+  repeated string reason_codes = 23;
+  repeated ReasonDetailProto reason_details = 24;
+  string deterministic_explanation = 25;
+}
+
+message RejectedCandidateProto {
+  string candidate_code = 1;
+  string title = 2;
+  repeated string rejection_reason_codes = 3;
+  string rejection_explanation = 4;
+}
+
+message RankMealsProtoResponse {
+  bool succeeded = 1;
+  string error_code = 2;
+  string error_message = 3;
+  string contract_version = 4;
+  string rule_set_version = 5;
+  string weight_profile_version = 6;
+  string target_slot = 7;
+  repeated RankedCandidateProto accepted_candidates = 8;
+  repeated RejectedCandidateProto rejected_candidates = 9;
+}
+

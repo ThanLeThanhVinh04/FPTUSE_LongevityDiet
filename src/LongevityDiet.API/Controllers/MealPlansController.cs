@@ -1,7 +1,9 @@
 using LongevityDiet.API.Contracts.Planning;
+using LongevityDiet.API.Contracts.Recommendation;
 using LongevityDiet.API.Errors;
 using LongevityDiet.API.Security;
 using LongevityDiet.Services.Planning;
+using LongevityDiet.Services.Recommendation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +14,7 @@ namespace LongevityDiet.API.Controllers;
 [Route("api/v1/meal-plans")]
 public sealed class MealPlansController(
     MealPlanningService mealPlanningService,
+    RecommendationService recommendationService,
     ICurrentUser currentUser) : ControllerBase
 {
     [HttpGet("preferences")]
@@ -265,6 +268,47 @@ public sealed class MealPlansController(
         }
 
         return Ok(ToResponse(result.Value));
+    }
+
+    [HttpPost("{planId:guid}/meals/{plannedMealId:guid}/replace")]
+    public async Task<IActionResult> ReplacePlannedMeal(
+        Guid planId,
+        Guid plannedMealId,
+        [FromBody] ReplacePlanMealByRouteRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (currentUser.UserId is not { } userId)
+        {
+            return Unauthorized();
+        }
+
+        var result = await recommendationService.ReplacePlannedMealAsync(
+            userId,
+            new ReplacePlannedMealCommand(
+                planId,
+                plannedMealId,
+                request?.TargetCandidateCode,
+                request?.ReplacementReasonCode,
+                request?.ReasonNotes,
+                request?.AdditionalExcludedCodes),
+            cancellationToken);
+
+        return result.Succeeded ? Ok(result.Value) : this.ToProblem(result);
+    }
+
+    [HttpGet("{planId:guid}/replacements")]
+    public async Task<IActionResult> GetPlanReplacements(
+        Guid planId,
+        [FromQuery] int limit = 50,
+        CancellationToken cancellationToken = default)
+    {
+        if (currentUser.UserId is not { } userId)
+        {
+            return Unauthorized();
+        }
+
+        var result = await recommendationService.ListReplacementHistoryAsync(userId, planId, limit, cancellationToken);
+        return result.Succeeded ? Ok(result.Value) : this.ToProblem(result);
     }
 
     private static DietaryPreferenceResponse ToPreferenceResponse(DietaryPreferenceSummary summary) =>

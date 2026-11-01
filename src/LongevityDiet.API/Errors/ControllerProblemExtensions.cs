@@ -28,6 +28,16 @@ public static class ControllerProblemExtensions
             ["invalid_meal_type"] = StatusCodes.Status400BadRequest,
             ["invalid_meal_items"] = StatusCodes.Status400BadRequest,
             ["invalid_date_range"] = StatusCodes.Status400BadRequest,
+            ["invalid_slot_type"] = StatusCodes.Status400BadRequest,
+            ["invalid_candidate_code"] = StatusCodes.Status400BadRequest,
+            ["invalid_feedback_type"] = StatusCodes.Status400BadRequest,
+            ["invalid_food_token"] = StatusCodes.Status400BadRequest,
+            ["invalid_preference_kind"] = StatusCodes.Status400BadRequest,
+            ["food_preference_not_found"] = StatusCodes.Status404NotFound,
+            ["replacement_candidate_not_found"] = StatusCodes.Status404NotFound,
+            ["unsafe_replacement_candidate"] = StatusCodes.Status422UnprocessableEntity,
+            ["meal_plan_conflict"] = StatusCodes.Status409Conflict,
+            ["recommendation_service_unavailable"] = StatusCodes.Status503ServiceUnavailable,
         };
 
     public static ObjectResult ToProblem<T>(
