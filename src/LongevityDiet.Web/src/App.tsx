@@ -24,6 +24,12 @@ const ProfilePage = lazy(() =>
   profilePages().then((module) => ({ default: module.ProfilePage })),
 )
 
+const PlannerWorkspacePage = lazy(() =>
+  import('./pages/planner/PlannerWorkspacePage').then((module) => ({
+    default: module.PlannerWorkspacePage,
+  })),
+)
+
 function RouteLoading() {
   return (
     <div className="auth-loading" role="status">
@@ -63,7 +69,16 @@ function App() {
           path="/app"
           element={
             <ProtectedRoute>
-              <HomePage />
+              <PlannerWorkspacePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/planner"
+          element={
+            <ProtectedRoute>
+              <PlannerWorkspacePage />
             </ProtectedRoute>
           }
         />

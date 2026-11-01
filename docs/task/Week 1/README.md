@@ -10,7 +10,7 @@ Hoàn tất các dependency cốt lõi để hệ thống có business implement
 |---|---|---|---|
 | Task 1 - Identity, Authentication, Profile & Onboarding | Thành viên 1 (bạn) | Thành viên 3 | **Done** |
 | Task 2 - Food, Recipe, Diet Rule Catalog & Query Foundation | Thành viên 2 | Thành viên 4 | Not Started |
-| Task 3 - Deterministic Meal Planning, Meal Logging & Eating Window | Thành viên 3 | Thành viên 1 | Not Started |
+| Task 3 - Deterministic Meal Planning, Meal Logging & Eating Window | Thành viên 3 | Thành viên 1 | **Done** |
 | Task 4 - gRPC Recommendation + Outbox + Redis Streams + Worker | Thành viên 4 | Thành viên 2 | Not Started |
 
 ## Dependency chính

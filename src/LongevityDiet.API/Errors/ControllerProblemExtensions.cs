@@ -18,6 +18,16 @@ public static class ControllerProblemExtensions
             ["invalid_birth_year"] = StatusCodes.Status400BadRequest,
             ["invalid_meal_frequency"] = StatusCodes.Status400BadRequest,
             ["invalid_time_zone"] = StatusCodes.Status400BadRequest,
+            ["meal_plan_not_found"] = StatusCodes.Status404NotFound,
+            ["planned_meal_not_found"] = StatusCodes.Status404NotFound,
+            ["meal_log_not_found"] = StatusCodes.Status404NotFound,
+            ["no_safe_candidates"] = StatusCodes.Status422UnprocessableEntity,
+            ["invalid_plan_days"] = StatusCodes.Status400BadRequest,
+            ["invalid_dietary_pattern"] = StatusCodes.Status400BadRequest,
+            ["invalid_meal_log"] = StatusCodes.Status400BadRequest,
+            ["invalid_meal_type"] = StatusCodes.Status400BadRequest,
+            ["invalid_meal_items"] = StatusCodes.Status400BadRequest,
+            ["invalid_date_range"] = StatusCodes.Status400BadRequest,
         };
 
     public static ObjectResult ToProblem<T>(
