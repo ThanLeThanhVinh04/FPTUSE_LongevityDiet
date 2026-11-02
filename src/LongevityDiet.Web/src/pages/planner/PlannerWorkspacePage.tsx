@@ -23,6 +23,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/authState'
 import { api } from '../../lib/api'
 import { getApiErrorMessage } from '../../lib/apiError'
+import { FmdWorkspaceSection } from './FmdWorkspaceSection'
 
 export type PlannedMealDto = {
   id: string
@@ -844,6 +845,7 @@ export function PlannerWorkspacePage() {
           <a href="#meal-planner">Thực đơn 7 ngày</a>
           <a href="#recommendation-v2">Gợi ý & Đổi món v2</a>
           <a href="#meal-logger">Nhật ký bữa ăn</a>
+          <a href="#fmd-tracker">Chu kỳ FMD 5 ngày</a>
           <Link to="/">Trang giới thiệu</Link>
         </nav>
 
@@ -1872,6 +1874,9 @@ export function PlannerWorkspacePage() {
             </div>
           </div>
         </section>
+
+        {/* FMD FASTING MIMICKING DIET & SAFETY GATE SECTION */}
+        <FmdWorkspaceSection />
       </main>
     </div>
   )

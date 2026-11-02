@@ -38,6 +38,14 @@ public static class ControllerProblemExtensions
             ["unsafe_replacement_candidate"] = StatusCodes.Status422UnprocessableEntity,
             ["meal_plan_conflict"] = StatusCodes.Status409Conflict,
             ["recommendation_service_unavailable"] = StatusCodes.Status503ServiceUnavailable,
+            ["fmd_education_required"] = StatusCodes.Status400BadRequest,
+            ["fmd_assessment_required"] = StatusCodes.Status400BadRequest,
+            ["fmd_not_eligible"] = StatusCodes.Status422UnprocessableEntity,
+            ["fmd_professional_review_required"] = StatusCodes.Status422UnprocessableEntity,
+            ["fmd_active_cycle_exists"] = StatusCodes.Status409Conflict,
+            ["fmd_cycle_not_found"] = StatusCodes.Status404NotFound,
+            ["fmd_day_not_found"] = StatusCodes.Status404NotFound,
+            ["fmd_cycle_not_active"] = StatusCodes.Status400BadRequest,
         };
 
     public static ObjectResult ToProblem<T>(

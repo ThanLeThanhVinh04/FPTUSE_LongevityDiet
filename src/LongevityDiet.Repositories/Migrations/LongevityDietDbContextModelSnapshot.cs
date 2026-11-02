@@ -99,6 +99,189 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("EatingWindowSnapshots", (string)null);
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("CycleNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("StopReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("StoppedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("TargetDays")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Status");
+
+                    b.ToTable("FmdCycles", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycleDay", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DailyNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EnergyLevel")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("FmdCycleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("HungerLevel")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LoggedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateOnly>("PlanDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Symptoms")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("TargetCaloriesKcal")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("WaterIntakeLiters")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FmdCycleId", "DayNumber")
+                        .IsUnique();
+
+                    b.ToTable("FmdCycleDays", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdEducationAcknowledgement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("AcknowledgedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("DisclaimerAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("EducationVersion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("SourceCitation")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "EducationVersion");
+
+                    b.ToTable("FmdEducationAcknowledgements", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdSafetyAssessment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AnswersJson")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("AssessmentVersion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("EvaluatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("HasHighRiskFlag")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(600)
+                        .HasColumnType("nvarchar(600)");
+
+                    b.Property<string>("RecommendationsSummary")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ResultStatus")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("TriggeredRiskCodesCsv")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "EvaluatedAt");
+
+                    b.ToTable("FmdSafetyAssessments", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.MealLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -823,6 +1006,17 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("UserProfiles", (string)null);
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycleDay", b =>
+                {
+                    b.HasOne("LongevityDiet.Domain.Entities.FmdCycle", "FmdCycle")
+                        .WithMany("Days")
+                        .HasForeignKey("FmdCycleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FmdCycle");
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.MealLogItem", b =>
                 {
                     b.HasOne("LongevityDiet.Domain.Entities.MealLog", "MealLog")
@@ -876,6 +1070,11 @@ namespace LongevityDiet.Repositories.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycle", b =>
+                {
+                    b.Navigation("Days");
                 });
 
             modelBuilder.Entity("LongevityDiet.Domain.Entities.MealLog", b =>

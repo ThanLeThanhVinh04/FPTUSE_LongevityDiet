@@ -7,6 +7,7 @@ using LongevityDiet.Domain.Entities;
 using LongevityDiet.Repositories;
 using LongevityDiet.Repositories.Repositories;
 using LongevityDiet.Services.Identity;
+using LongevityDiet.Services.Fmd;
 using LongevityDiet.Services.Planning;
 using LongevityDiet.Services.Recommendation;
 using LongevityDiet.Services.Tracking;
@@ -60,6 +61,7 @@ try
     builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
     builder.Services.AddScoped<IMealPlanRepository, MealPlanRepository>();
     builder.Services.AddScoped<IRecommendationRepository, RecommendationRepository>();
+    builder.Services.AddScoped<IFmdRepository, FmdRepository>();
     builder.Services.AddScoped<IMealLogRepository, MealLogRepository>();
     builder.Services.AddScoped<IEatingWindowRepository, EatingWindowRepository>();
     builder.Services.AddScoped<IPlanningInputProvider, PlanningCatalogSnapshotProvider>();
@@ -70,6 +72,7 @@ try
     builder.Services.AddScoped<ProfileService>();
     builder.Services.AddScoped<MealPlanningService>();
     builder.Services.AddScoped<RecommendationService>();
+    builder.Services.AddScoped<FmdService>();
     builder.Services.AddScoped<MealTrackingService>();
     builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
     builder.Services.AddScoped<IAccessTokenProvider, JwtAccessTokenProvider>();

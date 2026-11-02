@@ -18,6 +18,10 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
     public DbSet<RecommendationFeedback> RecommendationFeedbacks => Set<RecommendationFeedback>();
     public DbSet<MealReplacementHistory> MealReplacementHistories => Set<MealReplacementHistory>();
     public DbSet<UserFoodPreference> UserFoodPreferences => Set<UserFoodPreference>();
+    public DbSet<FmdEducationAcknowledgement> FmdEducationAcknowledgements => Set<FmdEducationAcknowledgement>();
+    public DbSet<FmdSafetyAssessment> FmdSafetyAssessments => Set<FmdSafetyAssessment>();
+    public DbSet<FmdCycle> FmdCycles => Set<FmdCycle>();
+    public DbSet<FmdCycleDay> FmdCycleDays => Set<FmdCycleDay>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +60,7 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
         ConfigurePlanningModel(modelBuilder);
         ConfigureTrackingModel(modelBuilder);
         ConfigureRecommendationModel(modelBuilder);
+        ConfigureFmdModel(modelBuilder);
     }
 
     private static void ConfigurePlanningModel(ModelBuilder modelBuilder)
@@ -202,5 +207,46 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
         foodPreference.Property(x => x.Source).HasMaxLength(64).IsRequired();
         foodPreference.Property(x => x.Notes).HasMaxLength(500);
         foodPreference.HasIndex(x => new { x.UserId, x.FoodToken }).IsUnique();
+    }
+
+    private static void ConfigureFmdModel(ModelBuilder modelBuilder)
+    {
+        var acknowledgement = modelBuilder.Entity<FmdEducationAcknowledgement>();
+        acknowledgement.ToTable("FmdEducationAcknowledgements");
+        acknowledgement.HasKey(x => x.Id);
+        acknowledgement.Property(x => x.EducationVersion).HasMaxLength(64).IsRequired();
+        acknowledgement.Property(x => x.SourceCitation).HasMaxLength(300).IsRequired();
+        acknowledgement.HasIndex(x => new { x.UserId, x.EducationVersion });
+
+        var assessment = modelBuilder.Entity<FmdSafetyAssessment>();
+        assessment.ToTable("FmdSafetyAssessments");
+        assessment.HasKey(x => x.Id);
+        assessment.Property(x => x.AssessmentVersion).HasMaxLength(64).IsRequired();
+        assessment.Property(x => x.ResultStatus).HasConversion<string>().HasMaxLength(32);
+        assessment.Property(x => x.TriggeredRiskCodesCsv).HasMaxLength(1000).IsRequired();
+        assessment.Property(x => x.RecommendationsSummary).HasMaxLength(1000).IsRequired();
+        assessment.Property(x => x.AnswersJson).HasMaxLength(4000).IsRequired();
+        assessment.Property(x => x.Notes).HasMaxLength(600);
+        assessment.HasIndex(x => new { x.UserId, x.EvaluatedAt });
+
+        var cycle = modelBuilder.Entity<FmdCycle>();
+        cycle.ToTable("FmdCycles");
+        cycle.HasKey(x => x.Id);
+        cycle.Property(x => x.Status).HasConversion<string>().HasMaxLength(32);
+        cycle.Property(x => x.Notes).HasMaxLength(1000);
+        cycle.Property(x => x.StopReason).HasMaxLength(500);
+        cycle.HasIndex(x => new { x.UserId, x.Status });
+        cycle.HasMany(x => x.Days)
+            .WithOne(x => x.FmdCycle)
+            .HasForeignKey(x => x.FmdCycleId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        var cycleDay = modelBuilder.Entity<FmdCycleDay>();
+        cycleDay.ToTable("FmdCycleDays");
+        cycleDay.HasKey(x => x.Id);
+        cycleDay.Property(x => x.WaterIntakeLiters).HasPrecision(5, 2);
+        cycleDay.Property(x => x.Symptoms).HasMaxLength(500);
+        cycleDay.Property(x => x.DailyNotes).HasMaxLength(1000);
+        cycleDay.HasIndex(x => new { x.FmdCycleId, x.DayNumber }).IsUnique();
     }
 }
