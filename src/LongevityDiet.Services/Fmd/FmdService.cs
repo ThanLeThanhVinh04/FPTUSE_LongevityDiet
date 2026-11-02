@@ -12,7 +12,7 @@ public sealed class FmdService(
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
-    public FmdEducationContent GetEducationContent() =>
+    public static FmdEducationContent GetEducationContent() =>
         FmdSafetyCatalog.DefaultEducation;
 
     public async Task<ServiceResult<FmdSafetyStatusSummary>> GetSafetyStatusAsync(

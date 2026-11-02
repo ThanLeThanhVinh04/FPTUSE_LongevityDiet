@@ -3,7 +3,7 @@
 **Owner:** Thành viên 3
 **Reviewer:** Thành viên 1
 **Branch:** `feature/w4-t3-regression-evidence-demo`
-**Status:** Planned
+**Status:** Done
 
 ## Architecture alignment (ADR-005)
 
@@ -15,6 +15,20 @@
 ## Mục tiêu
 
 Chứng minh release candidate đúng bằng automated regression, rubric evidence có trọng số và một final demo repeatable đúng 7 mục PDF.
+
+## Hoàn thành Deliverables Week 4 Task 3
+
+1. **Automated Release Regression Suite**:
+   - File: `tests/LongevityDiet.IntegrationTests/ReleaseRegressionSuiteTests.cs` (18/18 Integration Tests PASS).
+   - Bao quát toàn bộ hành trình end-to-end: Register -> JWT Profile -> 7-Day Plan -> gRPC Recommendation v2 & Replacement -> Meal Log & Eating Window 12h -> FMD Safety Gate & Cycle Tracking -> Cross-tenant Security.
+   - Script tự động hóa kiểm thử: `scripts/Run-ReleaseRegression.ps1`.
+
+2. **100% PRN232 Assessment Matrix & Evidence Traceability**:
+   - Ánh xạ chi tiết toàn bộ 7 tiêu chí Rubric trong `docs/10-PRN232-TRACEABILITY.md`.
+
+3. **Final Demo Checklist (7/7 mục PDF) & Controlled Failure Guide**:
+   - File kịch bản diễn tập thuyết trình chi tiết: `docs/FINAL-DEMO-SCRIPT-7-STEPS.md`.
+   - Bao gồm kịch bản controlled failure (giả lập tắt gRPC hoặc Redis và chứng minh tính năng phục hồi an toàn).
 
 ## Release regression
 

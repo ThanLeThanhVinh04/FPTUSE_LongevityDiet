@@ -18,7 +18,7 @@ public sealed class FmdController(
     [AllowAnonymous]
     public IActionResult GetEducation()
     {
-        var content = fmdService.GetEducationContent();
+        var content = FmdService.GetEducationContent();
         var questions = FmdSafetyCatalog.ScreeningQuestions;
         return Ok(new
         {
