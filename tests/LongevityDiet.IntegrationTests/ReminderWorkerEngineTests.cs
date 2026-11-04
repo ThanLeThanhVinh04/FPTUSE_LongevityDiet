@@ -66,6 +66,35 @@ public sealed class ReminderWorkerEngineTests
     }
 
     [Fact]
+    public async Task WorkerRestart_ReloadsScheduleAndDoesNotRedeliverSameWindow()
+    {
+        await using var connection = new SqliteConnection("Data Source=:memory:");
+        await connection.OpenAsync();
+        var eventData = MakeEvent(1);
+        await using (var beforeRestart = CreateDb(connection))
+        {
+            await beforeRestart.Database.EnsureCreatedAsync();
+            var worker1 = new ReminderWorkerEngine(beforeRestart, TimeProvider.System);
+            Assert.True(await worker1.ApplyPreferenceAsync(eventData, default));
+            var due = await beforeRestart.Schedules
+                .SingleAsync(s => s.Category == ReminderCategory.Activity);
+            due.NextDueUtc = DateTime.UtcNow.AddSeconds(-20);
+            await beforeRestart.SaveChangesAsync();
+            Assert.Equal(1, await worker1.ScheduleDueAsync(default));
+        }
+
+        await using (var afterRestart = CreateDb(connection))
+        {
+            var worker2 = new ReminderWorkerEngine(afterRestart, TimeProvider.System);
+            Assert.False(await worker2.ApplyPreferenceAsync(eventData, default));
+            Assert.Equal(0, await worker2.ScheduleDueAsync(default));
+            Assert.Equal(1, await afterRestart.DispatchRecords.CountAsync());
+            Assert.Equal(1, await afterRestart.Outbox.CountAsync());
+            Assert.Equal(1, await afterRestart.ProcessedEvents.CountAsync());
+        }
+    }
+
+    [Fact]
     public async Task OptedOutReminder_NeverDispatches()
     {
         await using var connection = new SqliteConnection("Data Source=:memory:");

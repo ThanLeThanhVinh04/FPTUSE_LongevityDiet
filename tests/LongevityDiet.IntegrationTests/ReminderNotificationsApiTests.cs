@@ -159,6 +159,41 @@ public sealed class ReminderNotificationsApiTests : IClassFixture<IntegrationTes
     }
 
     [Fact]
+    public async Task DisabledNotificationCategory_IsRejectedEvenWhenGlobalOptInIsTrue()
+    {
+        await _factory.ResetDatabaseAsync();
+        using var client = await AuthClientAsync();
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<LongevityDietDbContext>();
+        var userId = await db.Users.AsNoTracking().Select(u => u.Id).SingleAsync();
+        var service = scope.ServiceProvider.GetRequiredService<ReminderService>();
+        await service.UpdatePreferencesAsync(userId, new ReminderPreferencesInput(
+            true, false, true, false, false,
+            new TimeOnly(20, 0), new TimeOnly(18, 30),
+            new TimeOnly(21, 0), new TimeOnly(9, 0),
+            new TimeOnly(22, 0), new TimeOnly(7, 0)), default);
+
+        var mealReminder = new NotificationReadyEvent(
+            Guid.NewGuid(), userId, ReminderCategory.MealLogging,
+            "Nhắc bữa ăn", "Bạn có thể ghi bữa ăn.", "/app",
+            "meal-20261105");
+        Assert.False(await service.PersistNotificationResultAsync(mealReminder, default));
+        Assert.Empty((await client.GetFromJsonAsync<NotificationPage>("/api/v1/notifications"))!.Items);
+        // The discarded source event is acknowledged idempotently, not retried forever.
+        Assert.Equal(1, await db.IdentityInbox.CountAsync());
+
+        var allowed = mealReminder with
+        {
+            EventId = Guid.NewGuid(),
+            Category = ReminderCategory.Activity,
+            DeduplicationKey = "activity-20261105",
+            DeepLink = "/activity",
+        };
+        Assert.True(await service.PersistNotificationResultAsync(allowed, default));
+        Assert.Single((await client.GetFromJsonAsync<NotificationPage>("/api/v1/notifications"))!.Items);
+    }
+
+    [Fact]
     public async Task NotificationInput_IsRestrictedToAllowedDeepLinks()
     {
         await _factory.ResetDatabaseAsync();

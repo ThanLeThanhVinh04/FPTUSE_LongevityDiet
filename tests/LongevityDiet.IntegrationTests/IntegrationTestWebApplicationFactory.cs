@@ -26,6 +26,7 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        builder.UseContentRoot(ResolveApiContentRoot());
 
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
@@ -55,6 +56,22 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
             services.AddDbContext<TrackingDbContext>(options =>
                 options.UseSqlite(_trackingConnection));
         });
+    }
+
+    private static string ResolveApiContentRoot()
+    {
+        // Works from dotnet test, console smoke runner and CI output folders.
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+        while (current is not null)
+        {
+            var candidate = Path.Combine(current.FullName, "src", "LongevityDiet.API");
+            if (File.Exists(Path.Combine(candidate, "LongevityDiet.API.csproj")))
+                return candidate;
+
+            current = current.Parent;
+        }
+
+        throw new DirectoryNotFoundException("Unable to locate LongevityDiet.API source root.");
     }
 
     public HttpClient CreateHttpsClient() =>

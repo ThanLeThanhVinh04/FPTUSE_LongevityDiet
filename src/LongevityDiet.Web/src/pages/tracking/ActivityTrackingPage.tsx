@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Activity, ArrowLeft, CalendarDays, Save, Trash2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api } from '../../lib/api'
 import { getApiErrorMessage } from '../../lib/apiError'
@@ -38,9 +38,12 @@ function localDateTime() {
   return new Date(n.getTime() - n.getTimezoneOffset() * 60_000).toISOString().slice(0, 16)
 }
 function todayIn(timeZone: string) {
-  return new Intl.DateTimeFormat('en-CA', {
+  const pieces = new Intl.DateTimeFormat('en-US', {
     year: 'numeric', month: '2-digit', day: '2-digit', timeZone,
-  }).format(new Date())
+  }).formatToParts(new Date())
+  const field = (type: 'year' | 'month' | 'day') =>
+    pieces.find((piece) => piece.type === type)?.value ?? ''
+  return `${field('year')}-${field('month')}-${field('day')}`
 }
 export function ActivityTrackingPage() {
   const qc = useQueryClient()
@@ -73,8 +76,15 @@ export function ActivityTrackingPage() {
     queryKey: ['activity-goal'],
     queryFn: async () => (await api.get<Goal>('/activities/goal')).data,
   })
+  useEffect(() => {
+    if (goal.data) {
+      setGoalMinutes(goal.data.weeklyMinutesTarget)
+      setGoalStrength(goal.data.weeklyStrengthSessionsTarget)
+    }
+  }, [goal.data])
   const score = useQuery({
     queryKey: ['ldas', localToday],
+    enabled: profile.isSuccess,
     queryFn: async () => (await api.get<Score>(`/ldas/${localToday}`)).data,
   })
   const refresh = async () => {
@@ -135,7 +145,7 @@ export function ActivityTrackingPage() {
                   <option key={id} value={id}>{label}</option>)}
               </select>
             </label>
-            <label>Thời gian bắt đầu
+            <label>Thời gian bắt đầu (giờ địa phương của thiết bị)
               <input required type="datetime-local" value={startedAt}
                 onChange={(event) => setStartedAt(event.target.value)} />
             </label>

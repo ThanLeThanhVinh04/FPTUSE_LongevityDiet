@@ -110,6 +110,37 @@ public sealed class ActivityLdasApiTests : IClassFixture<IntegrationTestWebAppli
     }
 
     [Fact]
+    public async Task DailySummaryAndLatestScore_AreComputedFromStoredMemberEntries()
+    {
+        await _factory.ResetDatabaseAsync();
+        using var client = await AuthorizedClientAsync();
+        var now = DateTimeOffset.UtcNow;
+        var startedAt = now.AddMinutes(-5);
+        using var create = await client.PostAsJsonAsync("/api/v1/activities", new
+        {
+            kind = 1, durationMinutes = 25, startedAt, note = "Morning walk",
+        });
+        Assert.Equal(HttpStatusCode.Created, create.StatusCode);
+        var localDate = TrackingService.LocalDate(startedAt,
+            TimeZoneInfo.FindSystemTimeZoneById("Asia/Ho_Chi_Minh"));
+
+        var summary = await client.GetFromJsonAsync<DailyActivitySummary>(
+            $"/api/v1/activities/daily?date={localDate:yyyy-MM-dd}");
+        Assert.NotNull(summary);
+        Assert.Equal(localDate, summary.LocalDate);
+        Assert.Equal(1, summary.ActivityCount);
+        Assert.Equal(25, summary.EquivalentMinutes);
+        Assert.Equal("Asia/Ho_Chi_Minh", summary.TimeZone);
+
+        var latest = await client.GetFromJsonAsync<ScoreView>("/api/v1/ldas/latest");
+        Assert.NotNull(latest);
+        Assert.True(latest.IsPartial);
+        Assert.Null(latest.Score);
+        Assert.Equal(35m, latest.CoveragePercent);
+        Assert.Equal(1, latest.Breakdown.Count(d => d.Code == "activity" && d.RawScore.HasValue));
+    }
+
+    [Fact]
     public async Task WeeklySummaryAndGoal_UsePersistedActivity()
     {
         await _factory.ResetDatabaseAsync();

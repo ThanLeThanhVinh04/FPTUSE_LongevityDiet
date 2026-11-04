@@ -17,6 +17,10 @@ public sealed record PageView<T>(
     IReadOnlyList<T> Items, int Page, int PageSize, int TotalItems, int TotalPages);
 public sealed record GoalInput(int WeeklyMinutesTarget, int WeeklyStrengthSessionsTarget);
 public sealed record GoalView(int WeeklyMinutesTarget, int WeeklyStrengthSessionsTarget, DateTimeOffset UpdatedAtUtc);
+public sealed record DailyActivitySummary(
+    DateOnly LocalDate, string TimeZone, int ActivityCount,
+    int EquivalentMinutes, int StrengthSessions);
+
 public sealed record ActivitySummary(
     DateOnly WeekStart, DateOnly WeekEnd, string TimeZone,
     int EquivalentMinutes, int StrengthSessions, int WeeklyMinutesTarget,
@@ -147,6 +151,24 @@ public sealed class TrackingService(
         return Project(goal);
     }
 
+    public async Task<DailyActivitySummary> GetDailySummaryAsync(
+        Guid userId, DateOnly? date, CancellationToken ct)
+    {
+        var zone = await ReadZoneAsync(userId, ct);
+        var localDate = date ?? LocalDate(clock.GetUtcNow(), zone);
+        if (localDate > LocalDate(clock.GetUtcNow(), zone))
+            throw new TrackingInputException("future_summary_date", "Future activity summary is not supported.");
+        var (start, end) = UtcBounds(localDate, localDate.AddDays(1), zone);
+        var rows = await db.Activities.AsNoTracking()
+            .Where(a => a.UserId == userId && !a.IsDeleted &&
+                        a.StartedAtUtc >= start.UtcDateTime &&
+                        a.StartedAtUtc < end.UtcDateTime).ToListAsync(ct);
+        return new DailyActivitySummary(
+            localDate, zone.Id, rows.Count,
+            rows.Sum(a => a.DurationMinutes * (a.Kind == ActivityKind.Vigorous ? 2 : 1)),
+            rows.Count(a => a.Kind == ActivityKind.Strength));
+    }
+
     public async Task<ActivitySummary> GetWeeklySummaryAsync(
         Guid userId, DateOnly? weekStart, CancellationToken ct)
     {
@@ -170,6 +192,12 @@ public sealed class TrackingService(
             Math.Round(Math.Min(100m, total * 100m / goal.WeeklyMinutesTarget), 2),
             goal.WeeklyStrengthSessionsTarget == 0 ? 100m :
                 Math.Round(Math.Min(100m, strength * 100m / goal.WeeklyStrengthSessionsTarget), 2));
+    }
+
+    public async Task<ScoreView> GetLatestScoreAsync(Guid userId, CancellationToken ct)
+    {
+        var zone = await ReadZoneAsync(userId, ct);
+        return await RecalculateAsync(userId, LocalDate(clock.GetUtcNow(), zone), zone, ct);
     }
 
     public async Task<ScoreView> GetScoreAsync(Guid userId, DateOnly date, CancellationToken ct)

@@ -152,6 +152,7 @@ public sealed class ReminderService(
             incoming.DeduplicationKey.Length > 160 ||
             incoming.Title.Length is < 1 or > 120 ||
             incoming.Body.Length > 500 ||
+            !Enum.IsDefined(incoming.Category) ||
             incoming.DeepLink is not ("/app" or "/activity" or "/notifications"))
             throw new ReminderAccessException("invalid_notification_event", "Invalid trusted notification event.");
 
@@ -168,13 +169,21 @@ public sealed class ReminderService(
 
             // Recheck current consent and account state, never trust worker snapshots.
             var user = await users.FindByIdAsync(incoming.UserId, ct);
-            var optedIn = await db.ReminderPreferences.AsNoTracking()
-                .AnyAsync(p => p.UserId == incoming.UserId && p.OptedIn, ct);
+            var pref = await db.ReminderPreferences.AsNoTracking()
+                .SingleOrDefaultAsync(p => p.UserId == incoming.UserId, ct);
+            var enabledForCategory = pref is { OptedIn: true } && incoming.Category switch
+            {
+                ReminderCategory.MealLogging => pref.MealLoggingEnabled,
+                ReminderCategory.Activity => pref.ActivityEnabled,
+                ReminderCategory.Challenge => pref.ChallengeEnabled,
+                ReminderCategory.WeeklySummary => pref.WeeklySummaryEnabled,
+                _ => false,
+            };
             var exists = await db.Notifications.AsNoTracking().AnyAsync(
                 n => n.UserId == incoming.UserId &&
                      n.DeduplicationKey == incoming.DeduplicationKey, ct);
 
-            if (user is { Status: AccountStatus.Active } && optedIn && !exists)
+            if (user is { Status: AccountStatus.Active } && enabledForCategory && !exists)
             {
                 db.Notifications.Add(new UserNotification
                 {
@@ -194,7 +203,7 @@ public sealed class ReminderService(
             });
             await db.SaveChangesAsync(ct);
             await transaction.CommitAsync(ct);
-            return !exists && optedIn && user is { Status: AccountStatus.Active };
+            return !exists && enabledForCategory && user is { Status: AccountStatus.Active };
         });
     }
 

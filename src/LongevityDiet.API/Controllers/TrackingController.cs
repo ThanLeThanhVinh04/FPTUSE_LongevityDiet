@@ -41,6 +41,10 @@ public sealed class TrackingController(
         int page = 1, int pageSize = 20, CancellationToken ct = default) =>
         Handle(async userId => Ok(await service.ListAsync(userId, from, to, page, pageSize, ct)));
 
+    [HttpGet("activities/daily")]
+    public Task<IActionResult> Daily(DateOnly? date, CancellationToken ct) =>
+        Handle(async userId => Ok(await service.GetDailySummaryAsync(userId, date, ct)));
+
     [HttpGet("activities/summary")]
     public Task<IActionResult> Summary(DateOnly? weekStart, CancellationToken ct) =>
         Handle(async userId => Ok(await service.GetWeeklySummaryAsync(userId, weekStart, ct)));
@@ -52,6 +56,10 @@ public sealed class TrackingController(
     [HttpPut("activities/goal")]
     public Task<IActionResult> UpdateGoal(GoalInput request, CancellationToken ct) =>
         Handle(async userId => Ok(await service.SetGoalAsync(userId, request, ct)));
+
+    [HttpGet("ldas/latest")]
+    public Task<IActionResult> Latest(CancellationToken ct) =>
+        Handle(async userId => Ok(await service.GetLatestScoreAsync(userId, ct)));
 
     [HttpGet("ldas/{date}")]
     public Task<IActionResult> Score(DateOnly date, CancellationToken ct) =>
