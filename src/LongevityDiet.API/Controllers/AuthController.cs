@@ -2,11 +2,13 @@ using LongevityDiet.API.Contracts.Auth;
 using LongevityDiet.API.Errors;
 using LongevityDiet.Services.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LongevityDiet.API.Controllers;
 
 [ApiController]
+[EnableRateLimiting("auth")]
 [AllowAnonymous]
 [Route("api/v1/auth")]
 public sealed class AuthController(AuthenticationService authenticationService) : ControllerBase

@@ -1,11 +1,15 @@
 using LongevityDiet.Domain.Entities;
 using LongevityDiet.Repositories.Repositories;
+using LongevityDiet.Repositories;
+using LongevityDiet.Services.Reminders;
+using Microsoft.EntityFrameworkCore;
 
 namespace LongevityDiet.Services.Identity;
 
 public sealed class ProfileService(
     IUserRepository users,
-    TimeProvider timeProvider)
+    TimeProvider timeProvider,
+    LongevityDietDbContext? db = null)
 {
     public async Task<ServiceResult<ProfileSummary>> GetAsync(
         Guid userId,
@@ -62,6 +66,7 @@ public sealed class ProfileService(
                 "Time zone is not recognized.");
         }
 
+        var previousTimeZone = user.Profile?.TimeZone ?? "Asia/Ho_Chi_Minh";
         var now = timeProvider.GetUtcNow();
         user.DisplayName = command.DisplayName.Trim();
         user.UpdatedAt = now;
@@ -86,6 +91,24 @@ public sealed class ProfileService(
             command.SleepTime.HasValue &&
             !string.IsNullOrWhiteSpace(command.TimeZone);
         user.Profile.UpdatedAt = now;
+
+        // Replan existing reminders whenever the profile time zone changes.
+        // Store the preference version + Outbox event in the SAME IdentityDb
+        // transaction as the profile change; no WorkerDb access here.
+        if (db is not null && !string.Equals(
+            previousTimeZone, user.Profile.TimeZone, StringComparison.Ordinal))
+        {
+            var reminder = await db.ReminderPreferences.SingleOrDefaultAsync(
+                p => p.UserId == userId, cancellationToken);
+            if (reminder is not null)
+            {
+                reminder.Version++;
+                reminder.UpdatedAtUtc = now;
+                db.IdentityOutbox.Add(ReminderPreferenceEventFactory.Create(
+                    userId, user.Profile.TimeZone,
+                    user.Status == AccountStatus.Active, reminder, now));
+            }
+        }
 
         await users.SaveChangesAsync(cancellationToken);
         return ServiceResult.Success(ToSummary(user));

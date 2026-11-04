@@ -1,12 +1,20 @@
 using System.Globalization;
+using System.Diagnostics;
+using System.Threading.RateLimiting;
 using System.Text;
 using LongevityDiet.API.Cloudflare;
 using LongevityDiet.API.OpenApi;
 using LongevityDiet.API.Security;
+using LongevityDiet.API.Reminders;
+using Microsoft.AspNetCore.RateLimiting;
+using Serilog.Context;
 using LongevityDiet.Domain.Entities;
 using LongevityDiet.Repositories;
 using LongevityDiet.Repositories.Repositories;
 using LongevityDiet.Services.Identity;
+using LongevityDiet.Services.Reminders;
+using LongevityDiet.Tracking;
+using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -44,14 +52,71 @@ try
         options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         options.AddOperationTransformer<AuthorizeOperationTransformer>();
     });
-    builder.Services.AddProblemDetails();
-    builder.Services.AddHealthChecks();
+    var readinessTags = new[] { "ready" };
+    builder.Services.AddProblemDetails(options =>
+    {
+        options.CustomizeProblemDetails = context =>
+            context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+    });
+    builder.Services.AddHealthChecks()
+        .AddCheck<LongevityDiet.API.Security.ReadinessCheck>("dependencies",
+            tags: readinessTags);
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        options.AddPolicy("auth", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "local",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 40, QueueLimit = 0,
+                    Window = TimeSpan.FromMinutes(1),
+                    AutoReplenishment = true,
+                }));
+        options.AddPolicy("member-api", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ??
+                    context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 150, QueueLimit = 0,
+                    Window = TimeSpan.FromMinutes(1),
+                    AutoReplenishment = true,
+                }));
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            var response = context.HttpContext.Response;
+            response.StatusCode = StatusCodes.Status429TooManyRequests;
+            response.Headers.RetryAfter = "60";
+            response.ContentType = "application/problem+json";
+            await response.WriteAsync(
+                "{\"type\":\"about:blank\",\"title\":\"rate_limited\",\"status\":429,\"detail\":\"Request rate limit exceeded. Please retry later.\"}",
+                cancellationToken);
+        };
+    });
     builder.Services.AddHttpContextAccessor();
 
     builder.Services.AddDbContext<LongevityDietDbContext>(options =>
         options.UseSqlServer(
             connectionString,
             sql => sql.EnableRetryOnFailure()));
+
+    // Transitional single-host adapter. Tracking gets an independent DbContext
+    // and separate SQL catalog, never the Identity DbContext.
+    var trackingConnection = builder.Configuration.GetConnectionString("Tracking");
+    if (string.IsNullOrWhiteSpace(trackingConnection))
+    {
+        var connection = new SqlConnectionStringBuilder(connectionString)
+        {
+            InitialCatalog = "LongevityTrackingDb",
+        };
+        trackingConnection = connection.ConnectionString;
+    }
+
+    builder.Services.AddDbContext<TrackingDbContext>(options =>
+        options.UseSqlServer(trackingConnection, sql => sql.EnableRetryOnFailure()));
+    builder.Services.AddScoped<ITrackingUserContext, IdentityTrackingUserContext>();
+    builder.Services.AddScoped<TrackingService>();
 
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     // Default SQL persistence is intentionally unchanged until Cloudflare D1
@@ -91,6 +156,10 @@ try
     }
     builder.Services.AddScoped<AuthenticationService>();
     builder.Services.AddScoped<ProfileService>();
+    builder.Services.AddScoped<ReminderService>();
+    builder.Services.AddTransient<LongevityDiet.API.Security.ReadinessCheck>();
+    if (!builder.Environment.IsEnvironment("Testing"))
+        builder.Services.AddHostedService<IdentityRedisBridge>();
     builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
     builder.Services.AddScoped<IAccessTokenProvider, JwtAccessTokenProvider>();
     builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
@@ -131,8 +200,24 @@ try
         await using var scope = app.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<LongevityDietDbContext>();
         await dbContext.Database.MigrateAsync();
+        var trackingDb = scope.ServiceProvider.GetRequiredService<TrackingDbContext>();
+        await trackingDb.Database.MigrateAsync();
     }
 
+    app.Use(async (httpContext, next) =>
+    {
+        var incoming = httpContext.Request.Headers["X-Correlation-ID"].ToString();
+        var safe = incoming.Length is > 0 and <= 64 && incoming.All(ch =>
+            ch is >= 'a' and <= 'z' or >= 'A' and <= 'Z' or >= '0' and <= '9' or '-' or '_');
+        var correlation = safe ? incoming : Guid.NewGuid().ToString("N");
+        httpContext.TraceIdentifier = correlation;
+        httpContext.Response.Headers["X-Correlation-ID"] = correlation;
+        Activity.Current?.SetTag("correlation.id", correlation);
+        using (LogContext.PushProperty("CorrelationId", correlation))
+        {
+            await next(httpContext);
+        }
+    });
     app.UseSerilogRequestLogging();
     app.UseExceptionHandler();
 
@@ -152,10 +237,19 @@ try
     }
 
     app.UseHttpsRedirection();
+    app.UseRouting();
     app.UseAuthentication();
+    app.UseRateLimiter();
     app.UseAuthorization();
 
-    app.MapHealthChecks("/health");
+    app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+    {
+        Predicate = _ => false, // liveness: process responds, no dependency required
+    });
+    app.MapHealthChecks("/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+    {
+        Predicate = check => check.Tags.Contains("ready"), // actual dependencies
+    });
     app.MapControllers();
 
     app.Run();

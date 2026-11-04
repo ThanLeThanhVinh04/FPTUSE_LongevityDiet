@@ -60,9 +60,9 @@ export function HomePage() {
           <a href="#principles">Nguyên tắc</a>
         </nav>
         <div className="header-actions">
-          <button className="round-button" aria-label="Thông báo">
+          <Link className="round-button" aria-label="Thông báo" to={user ? '/notifications' : '/login'}>
             <Bell size={17} strokeWidth={1.7} />
-          </button>
+          </Link>
           <Link className="account-button" to={user ? '/profile' : '/login'}>
             <UserRound size={16} strokeWidth={1.7} />
             <span>{user ? user.displayName : 'Đăng nhập'}</span>
@@ -85,6 +85,9 @@ export function HomePage() {
               với những gợi ý rõ ràng, vừa đủ và dễ duy trì mỗi ngày.
             </p>
             <div className="hero-actions">
+              {user && <Link className="primary-button" to="/activity">
+                Ghi hoạt động thực tế <ArrowRight size={16} />
+              </Link>}
               <Link className="primary-button" to="/app">
                 {user ? 'Tiếp tục ngày hôm nay' : 'Bắt đầu hành trình'}
                 <ArrowRight size={16} strokeWidth={1.8} />

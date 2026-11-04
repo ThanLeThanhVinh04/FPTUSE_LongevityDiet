@@ -14,6 +14,16 @@ const RegisterPage = lazy(() =>
   import('./pages/auth/RegisterPage').then((module) => ({ default: module.RegisterPage })),
 )
 
+const NotificationsPage = lazy(() =>
+  import('./pages/tracking/NotificationsPage')
+    .then((module) => ({ default: module.NotificationsPage })),
+)
+
+const ActivityTrackingPage = lazy(() =>
+  import('./pages/tracking/ActivityTrackingPage')
+    .then((module) => ({ default: module.ActivityTrackingPage })),
+)
+
 const profilePages = () => import('./pages/auth/ProfileEditorPage')
 
 const OnboardingPage = lazy(() =>
@@ -68,6 +78,22 @@ function App() {
           }
         />
 
+        <Route
+          path="/activity"
+          element={
+            <ProtectedRoute>
+              <ActivityTrackingPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/notifications"
+          element={
+            <ProtectedRoute>
+              <NotificationsPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

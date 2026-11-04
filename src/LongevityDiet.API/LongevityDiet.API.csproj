@@ -24,6 +24,7 @@
     <ProjectReference Include="..\LongevityDiet.Domain\LongevityDiet.Domain.csproj" />
     <ProjectReference Include="..\LongevityDiet.Repositories\LongevityDiet.Repositories.csproj" />
     <ProjectReference Include="..\LongevityDiet.Services\LongevityDiet.Services.csproj" />
+    <ProjectReference Include="..\LongevityDiet.Tracking\LongevityDiet.Tracking.csproj" />
   </ItemGroup>
 
   <ItemGroup>

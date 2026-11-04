@@ -22,6 +22,55 @@ namespace LongevityDiet.Repositories.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.IdentityInboxEvent", b =>
+                {
+                    b.Property<Guid>("EventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReceivedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("EventId");
+
+                    b.ToTable("IdentityInbox", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.IdentityOutboxEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(96)
+                        .HasColumnType("nvarchar(96)");
+
+                    b.Property<string>("PayloadJson")
+                        .IsRequired()
+                        .HasMaxLength(4096)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PublishAttempts")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PublishedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublishedAtUtc", "CreatedAtUtc");
+
+                    b.ToTable("IdentityOutbox", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -56,6 +105,55 @@ namespace LongevityDiet.Repositories.Migrations
                     b.HasIndex("UserId", "ExpiresAt");
 
                     b.ToTable("RefreshTokens", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.ReminderPreference", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("ActivityEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("ActivityTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("ChallengeEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("ChallengeTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("MealLoggingEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("MealTime")
+                        .HasColumnType("time");
+
+                    b.Property<bool>("OptedIn")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("QuietEnd")
+                        .HasColumnType("time");
+
+                    b.Property<TimeOnly>("QuietStart")
+                        .HasColumnType("time");
+
+                    b.Property<DateTimeOffset>("UpdatedAtUtc")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("WeeklySummaryEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<TimeOnly>("WeeklySummaryTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("ReminderPreferences", (string)null);
                 });
 
             modelBuilder.Entity("LongevityDiet.Domain.Entities.User", b =>
@@ -108,6 +206,56 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("Users", (string)null);
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.UserNotification", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeduplicationKey")
+                        .IsRequired()
+                        .HasMaxLength(160)
+                        .HasColumnType("nvarchar(160)");
+
+                    b.Property<string>("DeepLink")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTime?>("ReadAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "CreatedAtUtc");
+
+                    b.HasIndex("UserId", "DeduplicationKey")
+                        .IsUnique();
+
+                    b.ToTable("UserNotifications", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.UserProfile", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -154,6 +302,24 @@ namespace LongevityDiet.Repositories.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.ReminderPreference", b =>
+                {
+                    b.HasOne("LongevityDiet.Domain.Entities.User", null)
+                        .WithOne()
+                        .HasForeignKey("LongevityDiet.Domain.Entities.ReminderPreference", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.UserNotification", b =>
+                {
+                    b.HasOne("LongevityDiet.Domain.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("LongevityDiet.Domain.Entities.UserProfile", b =>

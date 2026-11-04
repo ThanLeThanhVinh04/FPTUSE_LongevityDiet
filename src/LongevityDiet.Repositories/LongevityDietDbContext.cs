@@ -8,6 +8,10 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
     public DbSet<User> Users => Set<User>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<ReminderPreference> ReminderPreferences => Set<ReminderPreference>();
+    public DbSet<UserNotification> Notifications => Set<UserNotification>();
+    public DbSet<IdentityOutboxEvent> IdentityOutbox => Set<IdentityOutboxEvent>();
+    public DbSet<IdentityInboxEvent> IdentityInbox => Set<IdentityInboxEvent>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -42,5 +46,36 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
             .WithMany(x => x.RefreshTokens)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        var preferences = modelBuilder.Entity<ReminderPreference>();
+        preferences.ToTable("ReminderPreferences");
+        preferences.HasKey(p => p.UserId);
+        preferences.HasOne<User>().WithOne()
+            .HasForeignKey<ReminderPreference>(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        var notifications = modelBuilder.Entity<UserNotification>();
+        notifications.ToTable("UserNotifications");
+        notifications.HasKey(n => n.Id);
+        notifications.Property(n => n.Category).HasConversion<string>().HasMaxLength(32);
+        notifications.Property(n => n.Title).HasMaxLength(120);
+        notifications.Property(n => n.Body).HasMaxLength(500);
+        notifications.Property(n => n.DeepLink).HasMaxLength(120);
+        notifications.Property(n => n.DeduplicationKey).HasMaxLength(160);
+        notifications.HasIndex(n => new { n.UserId, n.CreatedAtUtc });
+        notifications.HasIndex(n => new { n.UserId, n.DeduplicationKey }).IsUnique();
+        notifications.HasOne<User>().WithMany()
+            .HasForeignKey(n => n.UserId).OnDelete(DeleteBehavior.Cascade);
+
+        var outbox = modelBuilder.Entity<IdentityOutboxEvent>();
+        outbox.ToTable("IdentityOutbox");
+        outbox.HasKey(o => o.Id);
+        outbox.Property(o => o.EventType).HasMaxLength(96);
+        outbox.Property(o => o.PayloadJson).HasMaxLength(4096);
+        outbox.HasIndex(o => new { o.PublishedAtUtc, o.CreatedAtUtc });
+
+        var inbox = modelBuilder.Entity<IdentityInboxEvent>();
+        inbox.ToTable("IdentityInbox");
+        inbox.HasKey(i => i.EventId);
     }
 }

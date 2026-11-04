@@ -1,0 +1,50 @@
+.tracking-page{min-height:100vh;padding:34px 0 90px;max-width:1100px;color:var(--ink)}
+.tracking-header{margin-bottom:26px}
+.tracking-back{display:inline-flex;align-items:center;gap:8px;color:var(--green);font-size:13px;font-weight:700;margin-bottom:28px}
+.tracking-header h1{font:500 clamp(34px,4vw,57px)/1.04 'Cormorant Garamond',serif;margin:10px 0 14px}
+.tracking-header p{max-width:740px;line-height:1.7;color:#69766f;font-size:13px}
+.tracking-two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.tracking-panel{padding:27px;border:1px solid rgba(24,57,47,.12);background:#fff;border-radius:22px;box-shadow:0 8px 30px rgba(24,57,47,.04);margin-bottom:20px}
+.tracking-panel h2{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:700;margin:0 0 22px}
+.tracking-panel h3{font-size:14px;margin:20px 0 5px}
+.tracking-panel form{display:grid;gap:15px}
+.tracking-panel label{display:grid;gap:7px;font-size:12px;font-weight:700;color:#53695b}
+.tracking-panel input,.tracking-panel select,.tracking-panel textarea{width:100%;min-width:0;padding:12px 13px;font:inherit;font-size:13px;color:var(--ink);border:1px solid #d2dbd3;background:#fbfcf8;border-radius:11px}
+.tracking-panel textarea{min-height:85px;resize:vertical}
+.tracking-panel button:not(.tracking-history-item button){display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;background:var(--green);color:#fff;font-size:13px;font-weight:700;padding:12px 18px;border-radius:10px}
+.tracking-panel button:disabled{opacity:.5;cursor:not-allowed}
+.tracking-feedback{margin:16px 0;padding:12px 15px;border-radius:12px;color:#284a38;background:#e8f2e8;font-size:13px}
+.tracking-summary{display:grid;gap:13px}
+.tracking-summary strong{font-size:27px}
+.tracking-summary progress{width:100%;height:14px;accent-color:var(--green)}
+.tracking-summary span,.tracking-summary small{font-size:13px;color:#65776b}
+.tracking-goal{border-top:1px solid var(--line);margin-top:25px}
+.tracking-goal p{font-size:12px;line-height:1.5;color:#66796f}
+.tracking-score{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:20px}
+.tracking-score strong{font:500 36px 'Cormorant Garamond',serif}
+.tracking-score span{font-size:13px;color:#607169}
+.tracking-dimensions{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.tracking-dimensions>div{border:1px solid #e1e7df;border-radius:12px;padding:15px;background:#f8faf7}
+.tracking-dimensions span{display:block;font-size:12px;color:#596d5c}
+.tracking-dimensions strong{display:block;margin-top:10px;font-size:13px}
+.tracking-note{font-size:12px;line-height:1.65;color:#6e7a73}
+.tracking-history-item{display:flex;align-items:center;gap:20px;padding:17px 0;border-bottom:1px solid var(--line)}
+.tracking-history-item>div{flex:1;min-width:0;display:grid;gap:5px}
+.tracking-history-item strong{font-size:14px}
+.tracking-history-item small,.tracking-history-item span{font-size:12px;color:#718076}
+.tracking-history-item b{font-size:13px;white-space:nowrap}
+.tracking-history-item button{width:37px;height:37px;display:grid;place-items:center;border:1px solid #e6e7e0;background:#fff;color:#a34e4e;border-radius:10px}
+.tracking-pagination{display:flex;align-items:center;justify-content:center;gap:15px;margin-top:18px;font-size:12px}
+.tracking-pagination button{padding:10px!important}
+@media(max-width:760px){.tracking-two-col{grid-template-columns:1fr}.tracking-panel{padding:19px}.tracking-dimensions{grid-template-columns:1fr}.tracking-page{padding-top:18px}.tracking-header h1{font-size:41px}}
+
+.notification-toggle{display:flex!important;align-items:center;gap:10px!important;font-size:13px!important}
+.notification-toggle input{width:18px;height:18px;accent-color:var(--green)}
+.notification-preference{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:12px 0}
+.notification-time{max-width:160px}
+.notification-time input{padding:8px!important}
+.notification-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.notification-heading h2{margin:0 0 16px}
+.notification-heading h2 span{font-size:12px;color:#647b6c}
+.notification-heading button{margin-bottom:16px}
+@media(max-width:600px){.notification-preference{flex-wrap:wrap}.notification-heading{flex-wrap:wrap}}
