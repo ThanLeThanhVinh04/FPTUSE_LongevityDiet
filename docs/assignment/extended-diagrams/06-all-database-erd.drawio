@@ -1,0 +1,655 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mxfile host="app.diagrams.net" agent="ChatGPT" version="24.7.17" type="device">
+  <diagram id="ldc-db-index" name="00 DATABASE INDEX">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v1" value="DATABASE MAP — CURRENT vs TARGET" style="rounded=1;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontSize=30;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="70" y="40" width="1900" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="v2" value="CURRENT IMPLEMENTED&#xA;SQL Server 2022&#xA;LongevityDietDb&#xA;3 tables: Users / UserProfiles / RefreshTokens&#xA;1 DbContext, one SQL database" style="rounded=1;fillColor=#dceaf7;strokeColor=#3b6b9b;fontSize=22;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="70" y="175" width="915" height="235" as="geometry" />
+        </mxCell>
+        <mxCell id="v3" value="TARGET ARCHITECTURE (NOT YET IMPLEMENTED)&#xA;Six logical service-owned SQL databases&#xA;33 canonical logical table types, distributed by owner&#xA;No cross-database foreign keys or shared DbContext" style="rounded=1;fillColor=#e1f3e8;strokeColor=#418865;fontSize=22;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1075" y="175" width="915" height="235" as="geometry" />
+        </mxCell>
+        <mxCell id="v4" value="Identity SQL&#xA;7 entities" style="rounded=1;fillColor=#f6f8fb;strokeColor=#87a4bf;fontSize=23;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="75" y="515" width="420" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="v5" value="Catalog SQL&#xA;8 entities" style="rounded=1;fillColor=#f6f8fb;strokeColor=#87a4bf;fontSize=23;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="565" y="515" width="420" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="v6" value="Planning SQL&#xA;7 entities" style="rounded=1;fillColor=#f6f8fb;strokeColor=#87a4bf;fontSize=23;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1055" y="515" width="420" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="v7" value="Tracking SQL&#xA;7 entities" style="rounded=1;fillColor=#f6f8fb;strokeColor=#87a4bf;fontSize=23;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1545" y="515" width="420" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="v8" value="Recommendation SQL&#xA;1 canonical + proposed" style="rounded=1;fillColor=#f6f8fb;strokeColor=#87a4bf;fontSize=23;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="75" y="760" width="420" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="v9" value="Worker SQL&#xA;3 canonical + proposed" style="rounded=1;fillColor=#f6f8fb;strokeColor=#87a4bf;fontSize=23;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="750" y="760" width="600" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="v10" value="Cloudflare D1&#xA;PROPOSED seventh store" style="rounded=1;fillColor=#f6f8fb;strokeColor=#87a4bf;fontSize=23;whiteSpace=wrap;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="1425" y="760" width="570" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="v11" value="Interpretation: 7 + 8 + 7 + 7 + 1 + 3 = 33 distinct table definitions from the assignment documentation. Outbox / inbox tables are copied to every producer or consumer service as required. Cloudflare D1 is an additional FUTURE proposal and is not part of the current six SQL DBs." style="rounded=1;fillColor=#fff6e8;strokeColor=#ddbf83;fontSize=19;whiteSpace=wrap;align=center;spacing=20;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1050" width="1930" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="v12" value="Sources: docs/06-DATABASE-DESIGN.md; docs/assignment/03-DATA-MODEL.md; EF Core LongevityDietDbContext; ADR-005. Exact DDL exists only for the current 3 tables. Future fields are specified/proposed, NOT migrations." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=16;whiteSpace=wrap;align=center;" vertex="1" parent="1">
+          <mxGeometry x="70" y="1255" width="1930" height="75" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ldc-db-0" name="CURRENT SQL — DEPLOYED">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v13" value="CURRENT SQL — DEPLOYED" style="rounded=1;arcSize=5;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontStyle=1;whiteSpace=wrap;fontFamily=Arial;fontSize=27;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="34" width="2010" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v14" value="LongevityDietDb: physical SQL Server database from EF Core migration. ONLY these 3 tables exist in code as of main 1962735." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=17;align=left;whiteSpace=wrap;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="114" width="1980" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v15" value="Users" style="rounded=1;arcSize=8;fillColor=#375e7b;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="85" y="219" width="600" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v16" value="PK Id : uniqueidentifier&#xA;Email : nvarchar(320)&#xA;UQ NormalizedEmail : nvarchar(320)&#xA;PasswordHash : nvarchar(512)&#xA;DisplayName : nvarchar(120)&#xA;Role, Status : nvarchar(24)&#xA;CreatedAt, UpdatedAt : datetimeoffset" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="85" y="277" width="600" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v17" value="UserProfiles" style="rounded=1;arcSize=8;fillColor=#375e7b;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="750" y="219" width="600" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v18" value="PK, FK UserId -&gt; Users.Id&#xA;BirthYear : int?&#xA;TimeZone : nvarchar(100)&#xA;WakeTime, SleepTime : time?&#xA;PreferredMealFrequency : int&#xA;FoodPreference : nvarchar(500)?&#xA;ProfileCompleted : bit&#xA;UpdatedAt : datetimeoffset" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="750" y="277" width="600" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v19" value="RefreshTokens" style="rounded=1;arcSize=8;fillColor=#375e7b;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1415" y="219" width="600" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v20" value="PK Id : uniqueidentifier&#xA;FK UserId -&gt; Users.Id&#xA;UQ TokenHash : nvarchar(64)&#xA;CreatedAt, ExpiresAt : datetimeoffset&#xA;RevokedAt : datetimeoffset?&#xA;ReplacedByTokenId : uniqueidentifier?" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1415" y="277" width="600" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v21" value="RELATIONSHIP &amp; INTEGRITY NOTES" style="rounded=0;fillColor=none;strokeColor=none;fontColor=#214363;fontSize=19;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1090" width="1960" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="v22" value="• Users 1 : 1 UserProfiles&#xA;• Users 1 : many RefreshTokens" style="rounded=1;arcSize=5;fillColor=#ecf2f8;strokeColor=#becfdf;fontColor=#273d54;fontSize=15;whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1125" width="1940" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="v23" value="TokenHash (SHA-256), never plaintext in SQL. Refresh token delivered as HttpOnly browser cookie." style="rounded=1;fillColor=#fff4e3;strokeColor=#f0c98a;fontColor=#6a4b25;fontSize=15;whiteSpace=wrap;html=0;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1270" width="1970" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="erd-rel-000" edge="1" parent="1" source="v15" target="v17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="385" y="182" />
+              <mxPoint x="1050" y="182" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-001" edge="1" parent="1" source="v15" target="v19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="385" y="189" />
+              <mxPoint x="1715" y="189" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ldc-db-1" name="TARGET 1/6 — IDENTITY &amp; PROFILE SQL">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v24" value="TARGET 1/6 — IDENTITY &amp; PROFILE SQL" style="rounded=1;arcSize=5;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontStyle=1;whiteSpace=wrap;fontFamily=Arial;fontSize=27;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="34" width="2010" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v25" value="LongevityIdentityDb — LOGICAL TARGET, not deployed. The Cloudflare D1 design page shows a future RefreshToken storage migration." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=17;align=left;whiteSpace=wrap;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="114" width="1980" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v26" value="Users" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v27" value="PK Id : Guid&#xA;UQ NormalizedEmail : string(320)&#xA;Email : string(320)&#xA;PasswordHash : string&#xA;DisplayName : string(120)&#xA;Role, Status : enums&#xA;CreatedAt, UpdatedAt : UTC" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v28" value="UserProfiles" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v29" value="PK/FK UserId -&gt; Users.Id&#xA;BirthYear : int?&#xA;TimeZone : string(100)&#xA;WakeTime, SleepTime : time?&#xA;PreferredMealFrequency : int&#xA;FoodPreference : string?&#xA;ProfileCompleted : bool&#xA;UpdatedAt : UTC" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v30" value="RefreshTokens [legacy]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v31" value="PK Id : Guid&#xA;FK UserId -&gt; Users.Id&#xA;UQ TokenHash : SHA-256&#xA;CreatedAt, ExpiresAt : UTC&#xA;RevokedAt : UTC?&#xA;ReplacedByTokenId : Guid?&#xA;Target after Cloudflare cutover: remove" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v32" value="Allergies" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v33" value="PK Id : Guid&#xA;UQ Code : string&#xA;Name : string" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v34" value="UserAllergies" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v35" value="PK (UserId, AllergyId)&#xA;UserId -&gt; Users.Id&#xA;AllergyId -&gt; Allergies.Id&#xA;Severity, Note : optional" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v36" value="UserExcludedFoods" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v37" value="PK Id : Guid&#xA;UserId -&gt; Users.Id&#xA;FoodId : Guid? external ID only&#xA;FreeText, Reason : string?&#xA;CHECK FoodId OR FreeText" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v38" value="Reminders" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v39" value="PK Id : Guid&#xA;UserId -&gt; Users.Id&#xA;ReminderType : enum&#xA;ScheduleLocalTime : time&#xA;DaysOfWeekJson : JSON&#xA;IsEnabled : bool&#xA;NextDueAtUtc : UTC" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v40" value="RELATIONSHIP &amp; INTEGRITY NOTES" style="rounded=0;fillColor=none;strokeColor=none;fontColor=#214363;fontSize=19;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1090" width="1960" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="v41" value="• Users 1:1 UserProfiles&#xA;• Users 1:N UserAllergies, UserExcludedFoods, Reminders&#xA;• Allergies 1:N UserAllergies&#xA;• RefreshTokens migrate to Cloudflare D1 only after adapter + tests" style="rounded=1;arcSize=5;fillColor=#ecf2f8;strokeColor=#becfdf;fontColor=#273d54;fontSize=15;whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1125" width="1940" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="v42" value="No SQL foreign key from UserExcludedFoods.FoodId to CatalogDb.Foods. IDs are external references." style="rounded=1;fillColor=#fff4e3;strokeColor=#f0c98a;fontColor=#6a4b25;fontSize=15;whiteSpace=wrap;html=0;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1270" width="1970" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="erd-rel-002" edge="1" parent="1" source="v26" target="v28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="196" />
+              <mxPoint x="821" y="196" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-003" edge="1" parent="1" source="v26" target="v30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="203" />
+              <mxPoint x="1338" y="203" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-004" edge="1" parent="1" source="v27" target="v34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="580" />
+              <mxPoint x="304" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-005" edge="1" parent="1" source="v33" target="v34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1855" y="591" />
+              <mxPoint x="304" y="591" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-006" edge="1" parent="1" source="v27" target="v36" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="602" />
+              <mxPoint x="821" y="602" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-007" edge="1" parent="1" source="v27" target="v38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="613" />
+              <mxPoint x="1338" y="613" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ldc-db-2" name="TARGET 2/6 — CATALOG &amp; RULES SQL">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v43" value="TARGET 2/6 — CATALOG &amp; RULES SQL" style="rounded=1;arcSize=5;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontStyle=1;whiteSpace=wrap;fontFamily=Arial;fontSize=27;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="34" width="2010" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v44" value="LongevityCatalogDb — 8 documented logical tables. SQL FK references remain inside Catalog only." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=17;align=left;whiteSpace=wrap;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="114" width="1980" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v45" value="Foods" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v46" value="PK Id : Guid&#xA;Name, NormalizedName : string&#xA;Category : string&#xA;DefaultServingAmount, Unit&#xA;Calories, ProteinG, CarbohydrateG&#xA;FatG, SaturatedFatG, SugarG, FiberG&#xA;IsPlantBased, IsWholeGrain&#xA;IsLegume, IsFish, IsActive&#xA;IsDeleted : bool" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v47" value="Recipes" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v48" value="PK Id : Guid&#xA;Name, Description : string&#xA;MealType : enum&#xA;InstructionsSummary : string&#xA;PrepMinutes : int&#xA;IsPlantForward : bool&#xA;IsActive, IsDeleted : bool" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v49" value="RecipeIngredients" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v50" value="PK (RecipeId, FoodId)&#xA;FK RecipeId -&gt; Recipes.Id&#xA;FK FoodId -&gt; Foods.Id&#xA;Amount : decimal&#xA;Unit : string&#xA;IsOptional : bool" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v51" value="RecipeAllergens" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v52" value="PK (RecipeId, AllergyId)&#xA;FK RecipeId -&gt; Recipes.Id&#xA;AllergyId : Guid external Identity ID&#xA;Derived or persisted cache" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v53" value="DietRules" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v54" value="PK Id : Guid&#xA;UQ Code : string&#xA;Name, Category : string&#xA;IsMedicalSensitive : bool&#xA;IsActive : bool" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v55" value="RuleVersions" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v56" value="PK Id : Guid&#xA;FK DietRuleId -&gt; DietRules.Id&#xA;UQ (DietRuleId, VersionNumber)&#xA;RuleType, ParametersJson&#xA;SourceType, Title, Url, Evidence&#xA;EffectiveFromUtc, PublishedAtUtc&#xA;PublishedByUserId : external ID&#xA;IsCurrent : bool" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v57" value="RuleSetVersions" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v58" value="PK Id : Guid&#xA;VersionLabel : string&#xA;PublishedAtUtc : UTC&#xA;PublishedByUserId : external ID" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v59" value="RuleSetVersionItems" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v60" value="PK (RuleSetVersionId, RuleVersionId)&#xA;FK RuleSetVersionId -&gt; RuleSetVersions.Id&#xA;FK RuleVersionId -&gt; RuleVersions.Id" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v61" value="RELATIONSHIP &amp; INTEGRITY NOTES" style="rounded=0;fillColor=none;strokeColor=none;fontColor=#214363;fontSize=19;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1090" width="1960" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="v62" value="• Foods 1:N RecipeIngredients&#xA;• Recipes 1:N RecipeIngredients and RecipeAllergens&#xA;• DietRules 1:N RuleVersions&#xA;• RuleSetVersions N:M RuleVersions via RuleSetVersionItems" style="rounded=1;arcSize=5;fillColor=#ecf2f8;strokeColor=#becfdf;fontColor=#273d54;fontSize=15;whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1125" width="1940" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="v63" value="AllergyId and PublishedByUserId are cross-service stable IDs, NOT foreign keys across databases." style="rounded=1;fillColor=#fff4e3;strokeColor=#f0c98a;fontColor=#6a4b25;fontSize=15;whiteSpace=wrap;html=0;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1270" width="1970" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="erd-rel-008" edge="1" parent="1" source="v45" target="v49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="182" />
+              <mxPoint x="1338" y="182" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-009" edge="1" parent="1" source="v47" target="v49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="821" y="189" />
+              <mxPoint x="1338" y="189" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-010" edge="1" parent="1" source="v47" target="v51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="821" y="196" />
+              <mxPoint x="1855" y="196" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-011" edge="1" parent="1" source="v54" target="v56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="1030" />
+              <mxPoint x="821" y="1030" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-012" edge="1" parent="1" source="v56" target="v60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="821" y="991" />
+              <mxPoint x="1855" y="991" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-013" edge="1" parent="1" source="v58" target="v60" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1338" y="1004" />
+              <mxPoint x="1855" y="1004" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ldc-db-3" name="TARGET 3/6 — PLANNING SQL">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v64" value="TARGET 3/6 — PLANNING SQL" style="rounded=1;arcSize=5;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontStyle=1;whiteSpace=wrap;fontFamily=Arial;fontSize=27;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="34" width="2010" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v65" value="LongevityPlanningDb — meal plans, challenges and FMD safety; no cross-database joins." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=17;align=left;whiteSpace=wrap;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="114" width="1980" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v66" value="MealPlans" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v67" value="PK Id : Guid&#xA;UserId : Guid external Identity ID&#xA;StartDate, EndDate : date&#xA;Revision : int&#xA;RuleSetVersionId : external Catalog ID&#xA;Status : enum&#xA;GeneratedAtUtc : UTC" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v68" value="MealPlanDays" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v69" value="PK Id : Guid&#xA;FK MealPlanId -&gt; MealPlans.Id&#xA;Date : date&#xA;UQ (MealPlanId, Date)" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v70" value="PlannedMeals" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v71" value="PK Id : Guid&#xA;FK MealPlanDayId -&gt; MealPlanDays.Id&#xA;MealType : enum&#xA;RecipeId : external Catalog ID?&#xA;ScheduledTime : time?&#xA;Position : int&#xA;RecommendationReasonJson : JSON&#xA;IsReplaced : bool" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v72" value="Challenges" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v73" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;ChallengeType : enum&#xA;StartedOn, EndsOn : date&#xA;Status : enum&#xA;CurrentStreak : int" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v74" value="ChallengeDays" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v75" value="PK Id : Guid&#xA;FK ChallengeId -&gt; Challenges.Id&#xA;DayNumber : int&#xA;TemplateCode : string&#xA;CompletionRuleJson : JSON&#xA;CompletedAtUtc : UTC?&#xA;UQ (ChallengeId, DayNumber)" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v76" value="FmdSafetyAssessments" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v77" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;SubmittedAtUtc : UTC&#xA;AnswersJson : JSON&#xA;Result : eligibility enum&#xA;AcknowledgedAtUtc : UTC?" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v78" value="FmdCycles" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v79" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;FK SafetyAssessmentId&#xA;PlannedStartDate, EndDate : date&#xA;Status : enum&#xA;ClinicianApproved : bool?&#xA;Note : string?" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v80" value="RELATIONSHIP &amp; INTEGRITY NOTES" style="rounded=0;fillColor=none;strokeColor=none;fontColor=#214363;fontSize=19;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1090" width="1960" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="v81" value="• MealPlans 1:N MealPlanDays 1:N PlannedMeals&#xA;• Challenges 1:N ChallengeDays&#xA;• FmdSafetyAssessments 1:N FmdCycles" style="rounded=1;arcSize=5;fillColor=#ecf2f8;strokeColor=#becfdf;fontColor=#273d54;fontSize=15;whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1125" width="1940" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="v82" value="Planning -&gt; Recommendation is gRPC/HTTP2 :8085. RecipeId, RuleSetVersionId and UserId are external stable IDs." style="rounded=1;fillColor=#fff4e3;strokeColor=#f0c98a;fontColor=#6a4b25;fontSize=15;whiteSpace=wrap;html=0;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1270" width="1970" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="erd-rel-014" edge="1" parent="1" source="v66" target="v68" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="196" />
+              <mxPoint x="821" y="196" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-015" edge="1" parent="1" source="v68" target="v70" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="821" y="203" />
+              <mxPoint x="1338" y="203" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-016" edge="1" parent="1" source="v73" target="v74" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1855" y="580" />
+              <mxPoint x="304" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-017" edge="1" parent="1" source="v77" target="v79" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="821" y="1004" />
+              <mxPoint x="1338" y="1004" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ldc-db-4" name="TARGET 4/6 — TRACKING &amp; PROGRESS SQL">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v83" value="TARGET 4/6 — TRACKING &amp; PROGRESS SQL" style="rounded=1;arcSize=5;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontStyle=1;whiteSpace=wrap;fontFamily=Arial;fontSize=27;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="34" width="2010" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v84" value="LongevityTrackingDb — logs, adherence, projections; Worker publishes report result rather than writing this DB." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=17;align=left;whiteSpace=wrap;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="114" width="1980" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v85" value="MealLogs" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v86" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;ConsumedAtUtc : UTC&#xA;MealType : enum&#xA;Note : string?&#xA;IsDeleted : bool" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v87" value="MealLogItems" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v88" value="PK Id : Guid&#xA;FK MealLogId -&gt; MealLogs.Id&#xA;FoodId : external Catalog ID?&#xA;RecipeId : external Catalog ID?&#xA;Amount : decimal, Unit : string&#xA;CHECK FoodId XOR RecipeId" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v89" value="ActivityLogs" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v90" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;ActivityType : enum&#xA;StartedAtUtc : UTC&#xA;DurationMinutes : int&#xA;Intensity, Note : optional&#xA;IsDeleted : bool" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v91" value="EatingWindowSnapshots" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v92" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;LocalDate : date&#xA;FirstMealAtUtc, LastMealAtUtc&#xA;WindowMinutes : int&#xA;MinutesBeforeSleep : int?&#xA;UQ (UserId, LocalDate)" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v93" value="AdherenceScores" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v94" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;LocalDate : date&#xA;Score : decimal(5,2)&#xA;RuleSetVersionId : external ID&#xA;IsPartial : bool&#xA;MissingDataJson : JSON&#xA;CalculatedAtUtc : UTC" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v95" value="ScoreDimensions" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v96" value="PK Id : Guid&#xA;FK AdherenceScoreId -&gt; AdherenceScores.Id&#xA;DimensionCode : string&#xA;Weight : decimal&#xA;RawScore, WeightedScore : decimal&#xA;ExplanationJson : JSON" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v97" value="WeeklyReports" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v98" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;WeekStartDate : date&#xA;SummaryJson : JSON&#xA;GeneratedAtUtc : UTC&#xA;UQ (UserId, WeekStartDate)" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v99" value="RELATIONSHIP &amp; INTEGRITY NOTES" style="rounded=0;fillColor=none;strokeColor=none;fontColor=#214363;fontSize=19;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1090" width="1960" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="v100" value="• MealLogs 1:N MealLogItems&#xA;• AdherenceScores 1:N ScoreDimensions&#xA;• WeeklyReports arrive from idempotent worker-result events" style="rounded=1;arcSize=5;fillColor=#ecf2f8;strokeColor=#becfdf;fontColor=#273d54;fontSize=15;whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1125" width="1940" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="v101" value="Idempotency and transactional Outbox local tables should be added per producer/consumer; see technical storage page." style="rounded=1;fillColor=#fff4e3;strokeColor=#f0c98a;fontColor=#6a4b25;fontSize=15;whiteSpace=wrap;html=0;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1270" width="1970" height="62" as="geometry" />
+        </mxCell>
+        <mxCell id="erd-rel-018" edge="1" parent="1" source="v85" target="v87" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=0;entryX=0.5;entryY=0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="196" />
+              <mxPoint x="821" y="196" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="erd-rel-019" edge="1" parent="1" source="v94" target="v96" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;strokeColor=#4c7399;strokeWidth=2;startArrow=ERone;endArrow=ERmany;startFill=0;endFill=0;exitX=0.5;exitY=1;entryX=0.5;entryY=1;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="304" y="1030" />
+              <mxPoint x="821" y="1030" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ldc-db-5" name="TARGET 5/6 — RECOMMENDATION SQL">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v102" value="TARGET 5/6 — RECOMMENDATION SQL" style="rounded=1;arcSize=5;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontStyle=1;whiteSpace=wrap;fontFamily=Arial;fontSize=27;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="34" width="2010" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v103" value="LongevityRecommendationDb — documentation defines feedback and conceptual local snapshots; snapshot physical DDL does NOT yet exist." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=17;align=left;whiteSpace=wrap;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="114" width="1980" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v104" value="RecommendationFeedback" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v105" value="PK Id : Guid&#xA;UserId : external Identity ID&#xA;RequestId : Guid&#xA;RecipeId : external Catalog ID&#xA;FeedbackType : enum&#xA;Comment : string?&#xA;CreatedAtUtc : UTC" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v106" value="CatalogSnapshots [PROPOSED]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v107" value="PK SnapshotId : Guid&#xA;SourceCatalogVersion : string&#xA;FoodOrRecipeId : Guid&#xA;SafePayloadJson : JSON&#xA;ReceivedAtUtc : UTC&#xA;UQ (Version, SourceId)" style="rounded=1;arcSize=5;fillColor=#fff7e7;strokeColor=#cc9c48;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v108" value="RuleSnapshots [PROPOSED]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v109" value="PK SnapshotId : Guid&#xA;RuleSetVersionId : Guid&#xA;RulePayloadJson : JSON&#xA;ReceivedAtUtc : UTC&#xA;Indexed for active version" style="rounded=1;arcSize=5;fillColor=#fff7e7;strokeColor=#cc9c48;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v110" value="RankingRequests [PROPOSED]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v111" value="PK RequestId : Guid&#xA;UserId : external Identity ID&#xA;RuleSetVersionId : Guid&#xA;RequestedAtUtc : UTC&#xA;Status / CorrelationId&#xA;Do NOT persist raw health secrets" style="rounded=1;arcSize=5;fillColor=#fff7e7;strokeColor=#cc9c48;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v112" value="RELATIONSHIP &amp; INTEGRITY NOTES" style="rounded=0;fillColor=none;strokeColor=none;fontColor=#214363;fontSize=19;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1090" width="1960" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="v113" value="• Feedback.RequestId links to request metadata, not mandatory FK until schema is approved&#xA;• Catalog and Rule snapshots populated from versioned integration events" style="rounded=1;arcSize=5;fillColor=#ecf2f8;strokeColor=#becfdf;fontColor=#273d54;fontSize=15;whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1125" width="1940" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="v114" value="Only RecommendationFeedback belongs to the canonical 33-table model; other three boxes are explicitly proposed extensions." style="rounded=1;fillColor=#fff4e3;strokeColor=#f0c98a;fontColor=#6a4b25;fontSize=15;whiteSpace=wrap;html=0;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1270" width="1970" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ldc-db-6" name="TARGET 6/6 — BACKGROUND WORKER SQL">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v115" value="TARGET 6/6 — BACKGROUND WORKER SQL" style="rounded=1;arcSize=5;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontStyle=1;whiteSpace=wrap;fontFamily=Arial;fontSize=27;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="34" width="2010" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v116" value="LongevityWorkerDb — operational ownership. Technical Outbox/ProcessedEvent patterns are cloned locally into publishing/consuming service DBs when needed." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=17;align=left;whiteSpace=wrap;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="114" width="1980" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v117" value="ProcessedEvents" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v118" value="PK (EventId, ConsumerName)&#xA;EventId : Guid&#xA;ConsumerName : string&#xA;ProcessedAtUtc : UTC&#xA;UQ event + consumer" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v119" value="OutboxMessages" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="585" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v120" value="PK Id/EventId : Guid&#xA;EventType : string&#xA;PayloadJson : JSON&#xA;OccurredAtUtc : UTC&#xA;PublishedAtUtc : UTC?&#xA;AttemptCount : int&#xA;LastError : string?" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="585" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v121" value="AuditLogs" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v122" value="PK Id : Guid&#xA;ActorUserId : external Identity ID&#xA;Action, EntityType : string&#xA;EntityId : Guid&#xA;SafeDiffJson : JSON&#xA;CorrelationId : string&#xA;OccurredAtUtc : UTC" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1102" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v123" value="WorkerJobs [PROPOSED]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="219" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v124" value="PK JobId : Guid&#xA;JobType, Status : string&#xA;DueAtUtc, LastAttemptAtUtc&#xA;Attempts / CorrelationId&#xA;Completion metadata" style="rounded=1;arcSize=5;fillColor=#fff7e7;strokeColor=#cc9c48;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1619" y="277" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v125" value="DeadLetterEvents [PROPOSED]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=20;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="68" y="619" width="472" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v126" value="PK EventId : Guid&#xA;ReasonCode, SafePayloadRef&#xA;FailedAtUtc : UTC&#xA;RetryCount : int&#xA;ResolutionStatus : string" style="rounded=1;arcSize=5;fillColor=#fff7e7;strokeColor=#cc9c48;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="68" y="677" width="472" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v127" value="RELATIONSHIP &amp; INTEGRITY NOTES" style="rounded=0;fillColor=none;strokeColor=none;fontColor=#214363;fontSize=19;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1090" width="1960" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="v128" value="• ProcessedEvents idempotent per consumer&#xA;• OutboxMessages owned by each producer, never one central database&#xA;• AuditLogs domain-owned; centralized ops events must not write foreign DB" style="rounded=1;arcSize=5;fillColor=#ecf2f8;strokeColor=#becfdf;fontColor=#273d54;fontSize=15;whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1125" width="1940" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="v129" value="WorkerJobs and DeadLetterEvents are design extensions. Worker must NEVER poll other services' Outbox directly." style="rounded=1;fillColor=#fff4e3;strokeColor=#f0c98a;fontColor=#6a4b25;fontSize=15;whiteSpace=wrap;html=0;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1270" width="1970" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="ldc-db-7" name="CLOUDFLARE D1 — FUTURE TOKEN DATABASE">
+    <mxGraphModel dx="2000" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="2150" pageHeight="1400">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v130" value="CLOUDFLARE D1 — FUTURE TOKEN DATABASE" style="rounded=1;arcSize=5;fillColor=#16385a;strokeColor=#16385a;fontColor=#ffffff;fontStyle=1;whiteSpace=wrap;fontFamily=Arial;fontSize=27;align=left;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="55" y="34" width="2010" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v131" value="PROPOSAL ONLY — Cloudflare account/binding not configured. Move refresh-session HASH metadata, not raw refresh tokens, using a Cloudflare Worker as sole API." style="rounded=0;fillColor=none;strokeColor=none;fontColor=#34475c;fontSize=17;align=left;whiteSpace=wrap;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="114" width="1980" height="56" as="geometry" />
+        </mxCell>
+        <mxCell id="v132" value="RefreshSessionRecords [PROPOSED]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=17;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="85" y="219" width="600" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v133" value="PK TokenId : UUID&#xA;UQ TokenHash : SHA-256 hex&#xA;UserId : stable Identity ID&#xA;CreatedAtUtc, ExpiresAtUtc&#xA;RevokedAtUtc : UTC?&#xA;ReplacedByTokenId : UUID?&#xA;FamilyId : UUID (rotation lineage)&#xA;DeviceLabel : optional, non-sensitive" style="rounded=1;arcSize=5;fillColor=#fff7e7;strokeColor=#cc9c48;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="85" y="277" width="600" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v134" value="SessionReplayAudit [PROPOSED]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=17;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="750" y="219" width="600" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v135" value="PK AuditId : UUID&#xA;TokenId : UUID&#xA;DetectedAtUtc : UTC&#xA;Action : revoke family&#xA;CorrelationId : string" style="rounded=1;arcSize=5;fillColor=#fff7e7;strokeColor=#cc9c48;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="750" y="277" width="600" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v136" value="Cloudflare Worker API [NOT A TABLE]" style="rounded=1;arcSize=8;fillColor=#25486c;strokeColor=#2b4b6b;fontColor=#ffffff;fontSize=17;fontStyle=1;fontFamily=Arial;align=left;spacingLeft=14;" vertex="1" parent="1">
+          <mxGeometry x="1415" y="219" width="600" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="v137" value="POST /sessions/issue&#xA;POST /sessions/rotate&#xA;POST /sessions/revoke&#xA;Authenticate service to service&#xA;D1 binding is private&#xA;Do not publish raw tokens in logs" style="rounded=1;arcSize=5;fillColor=#f4f8fd;strokeColor=#82a6c3;fontColor=#1e293b;fontSize=16;fontFamily=Consolas;whiteSpace=wrap;html=0;align=left;verticalAlign=top;spacingTop=13;spacingLeft=14;spacingRight=8;" vertex="1" parent="1">
+          <mxGeometry x="1415" y="277" width="600" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="v138" value="RELATIONSHIP &amp; INTEGRITY NOTES" style="rounded=0;fillColor=none;strokeColor=none;fontColor=#214363;fontSize=19;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1090" width="1960" height="37" as="geometry" />
+        </mxCell>
+        <mxCell id="v139" value="• Identity API -&gt; authenticated Cloudflare Worker -&gt; D1 (private binding)&#xA;• Use atomic D1 transaction / conditional rotate to prevent replay and race&#xA;• Old SQL RefreshTokens must remain until migration has completed" style="rounded=1;arcSize=5;fillColor=#ecf2f8;strokeColor=#becfdf;fontColor=#273d54;fontSize=15;whiteSpace=wrap;html=0;align=left;verticalAlign=middle;spacingLeft=16;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1125" width="1940" height="127" as="geometry" />
+        </mxCell>
+        <mxCell id="v140" value="Cloudflare Workers Secrets store API credentials/signing keys; D1 stores refresh-session hashes and expiry, not raw tokens." style="rounded=1;fillColor=#fff4e3;strokeColor=#f0c98a;fontColor=#6a4b25;fontSize=15;whiteSpace=wrap;html=0;align=left;spacingLeft=16;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="65" y="1270" width="1970" height="62" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

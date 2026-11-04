@@ -272,3 +272,20 @@ The project distinguishes:
 4. project-defined software heuristics such as LDAS.
 
 See `docs/01-BOOK-RESEARCH.md` and `docs/11-BOOK-TO-SOFTWARE-TRACEABILITY.md`.
+
+
+## Extended C2 architecture, complete SQL diagrams and Cloudflare session prototype (November 2026)
+
+Editable deliverables under [`docs/assignment/extended-diagrams`](docs/assignment/extended-diagrams):
+
+- [C2 Component Architecture, 8 pages](docs/assignment/extended-diagrams/05-c2-component-architecture.drawio) — one Current API page + seven explicitly Target pages.
+- [All Database Diagrams, 9 pages](docs/assignment/extended-diagrams/06-all-database-erd.drawio) — physical Current SQL, six logical target SQL DBs, plus optional future Cloudflare D1 session store.
+- [C2 PDF](docs/assignment/extended-diagrams/05-c2-component-architecture.pdf) and [Database PDF](docs/assignment/extended-diagrams/06-all-database-erd.pdf); 17 PNG pages in `extended-diagrams/previews/`.
+- [Data model rationale and 33/33 table mapping](docs/assignment/06-C2-AND-DATABASE-MAPPING.md).
+- [Cloudflare D1 security/migration guide](docs/security/CLOUDFLARE-REFRESH-TOKENS.md) and [proposed Worker source](cloudflare/refresh-sessions/README.md).
+
+**Current runtime remains ONE SQL database, containing three EF Core entity tables.** The six SQL databases, split services and most of the 33 target entity types are design-only, not deployed. The Cloudflare refresh-session store is implemented as a **feature-flagged, OFF-by-default prototype**, never deployed without a configured Cloudflare account and complete E2E validation. The existing SQL refresh-token behavior remains the default.
+
+Validation: `powershell -File scripts/Validate-C2DbDiagrams.ps1`, `node --test cloudflare/refresh-sessions/tests/worker.test.mjs`, `dotnet test tests/LongevityDiet.IntegrationTests -c Release`.
+
+To opt in *after provisioning and verifying* a Cloudflare Worker + D1, set secret environment variables `CloudflareSessions__Enabled=true`, `CloudflareSessions__BaseUrl=https://YOUR_PRIVATE_WORKER_HOST/` and `CloudflareSessions__ServiceBearer=<FROM_SECURE_SECRET_MANAGER>`; do **not** put credentials into Git or `appsettings.json`. See the migration guide before switching live sessions.

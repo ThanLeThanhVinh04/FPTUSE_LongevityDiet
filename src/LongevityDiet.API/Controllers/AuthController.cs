@@ -106,7 +106,10 @@ public sealed class AuthController(AuthenticationService authenticationService) 
         new()
         {
             HttpOnly = true,
-            Secure = Request.IsHttps,
+            // Fail closed for production deployments even behind a TLS proxy that
+            // has not yet populated forwarded scheme headers.
+            Secure = Request.IsHttps || !HttpContext.RequestServices
+                .GetRequiredService<IHostEnvironment>().IsDevelopment(),
             SameSite = SameSiteMode.Strict,
             Path = "/api/v1/auth",
             Expires = expires,

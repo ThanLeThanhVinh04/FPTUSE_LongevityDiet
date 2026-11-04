@@ -1,0 +1,14 @@
+# Cloudflare deployment requires your own D1 account/binding and secret; this file does NOT deploy.
+name = "longevity-refresh-session-store"
+main = "src/index.mjs"
+compatibility_date = "2026-11-04"
+workers_dev = false
+
+[[d1_databases]]
+binding = "DB"
+database_name = "longevity-refresh-session-store"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[triggers]
+crons = ["0 4 * * *"]

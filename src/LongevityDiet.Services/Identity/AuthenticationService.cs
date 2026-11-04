@@ -63,6 +63,9 @@ public sealed class AuthenticationService(
         var session = CreateSession(user, now);
         await refreshTokens.AddAsync(session.TokenEntity, cancellationToken);
         await users.SaveChangesAsync(cancellationToken);
+        // SQL provider has already committed through the shared DbContext.
+        // Cloudflare provider writes the session only after User is persisted.
+        await refreshTokens.SaveChangesAsync(cancellationToken);
 
         return ServiceResult.Success(session.Session);
     }
@@ -108,6 +111,9 @@ public sealed class AuthenticationService(
 
         await refreshTokens.AddAsync(session.TokenEntity, cancellationToken);
         await users.SaveChangesAsync(cancellationToken);
+        // SQL provider has already committed through the shared DbContext.
+        // Cloudflare provider writes the session only after User is persisted.
+        await refreshTokens.SaveChangesAsync(cancellationToken);
 
         return ServiceResult.Success(session.Session);
     }

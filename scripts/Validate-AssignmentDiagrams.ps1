@@ -5,6 +5,13 @@ $diagramDir = Join-Path $root 'docs\assignment\diagrams'
 $previewDir = Join-Path $root 'docs\assignment\previews'
 $vectorDir = Join-Path $root 'docs\assignment\vector'
 $drawio = 'D:\Draw.io\draw.io.exe'
+if (-not (Test-Path -LiteralPath $drawio)) {
+    $portable = Join-Path (Split-Path $root -Parent) '_diagram_toolkit_sources\drawio-portable-32.6.1\draw.io.exe'
+    if (Test-Path -LiteralPath $portable) { $drawio = $portable }
+}
+if (-not (Test-Path -LiteralPath $drawio)) {
+    throw "Draw.io Desktop is required to render Assignment diagrams."
+}
 
 function Invoke-DrawIoExport {
     param(
@@ -184,6 +191,10 @@ if ($pythonCommand) {
 else {
     $uvCommand = Get-Command uv -ErrorAction SilentlyContinue
     $uvPath = if ($uvCommand) { $uvCommand.Source } else { Join-Path $env:USERPROFILE '.local\bin\uv.exe' }
+    if (-not (Test-Path $uvPath)) {
+        $portableUv = Join-Path (Split-Path $root -Parent) '_diagram_toolkit_sources\uv-portable-0.13.7\uv.exe'
+        if (Test-Path -LiteralPath $portableUv) { $uvPath = $portableUv }
+    }
     if (-not (Test-Path $uvPath)) {
         throw 'Neither Python nor uv is available; physical DB section preview regeneration is mandatory.'
     }

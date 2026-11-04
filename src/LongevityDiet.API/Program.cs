@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using LongevityDiet.API.Cloudflare;
 using LongevityDiet.API.OpenApi;
 using LongevityDiet.API.Security;
 using LongevityDiet.Domain.Entities;
@@ -53,7 +54,41 @@ try
             sql => sql.EnableRetryOnFailure()));
 
     builder.Services.AddScoped<IUserRepository, UserRepository>();
-    builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+    // Default SQL persistence is intentionally unchanged until Cloudflare D1
+    // has been provisioned, migrated, authenticated, and E2E verified.
+    var cloudflareSessions = builder.Configuration
+        .GetSection(CloudflareSessionOptions.SectionName)
+        .Get<CloudflareSessionOptions>() ?? new CloudflareSessionOptions();
+
+    builder.Services.Configure<CloudflareSessionOptions>(
+        builder.Configuration.GetSection(CloudflareSessionOptions.SectionName));
+
+    if (cloudflareSessions.Enabled)
+    {
+        if (!Uri.TryCreate(cloudflareSessions.BaseUrl, UriKind.Absolute, out var remote) ||
+            remote.Scheme != Uri.UriSchemeHttps ||
+            remote.AbsolutePath != "/" ||
+            !string.IsNullOrEmpty(remote.UserInfo) ||
+            !string.IsNullOrWhiteSpace(remote.Query) ||
+            !string.IsNullOrWhiteSpace(remote.Fragment) ||
+            string.IsNullOrWhiteSpace(cloudflareSessions.ServiceBearer) ||
+            cloudflareSessions.ServiceBearer.Length < 32)
+        {
+            throw new InvalidOperationException(
+                "CloudflareSessions requires a root HTTPS BaseUrl and ServiceBearer secret (at least 32 characters).");
+        }
+
+        builder.Services.AddHttpClient<IRefreshTokenRepository, CloudflareRefreshTokenRepository>(
+            client =>
+            {
+                client.BaseAddress = remote;
+                client.Timeout = TimeSpan.FromSeconds(5);
+            });
+    }
+    else
+    {
+        builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+    }
     builder.Services.AddScoped<AuthenticationService>();
     builder.Services.AddScoped<ProfileService>();
     builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
