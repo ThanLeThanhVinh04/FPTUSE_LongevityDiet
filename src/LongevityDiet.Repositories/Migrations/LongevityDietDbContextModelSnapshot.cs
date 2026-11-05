@@ -99,6 +99,189 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("EatingWindowSnapshots", (string)null);
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycle", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("CycleNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("StopReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTimeOffset?>("StoppedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("TargetDays")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Status");
+
+                    b.ToTable("FmdCycles", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycleDay", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DailyNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EnergyLevel")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("FmdCycleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("HungerLevel")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LoggedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateOnly>("PlanDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Symptoms")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("TargetCaloriesKcal")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("WaterIntakeLiters")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FmdCycleId", "DayNumber")
+                        .IsUnique();
+
+                    b.ToTable("FmdCycleDays", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdEducationAcknowledgement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("AcknowledgedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("DisclaimerAccepted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("EducationVersion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("SourceCitation")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "EducationVersion");
+
+                    b.ToTable("FmdEducationAcknowledgements", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdSafetyAssessment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AnswersJson")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("AssessmentVersion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("EvaluatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("HasHighRiskFlag")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(600)
+                        .HasColumnType("nvarchar(600)");
+
+                    b.Property<string>("RecommendationsSummary")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("ResultStatus")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("TriggeredRiskCodesCsv")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "EvaluatedAt");
+
+                    b.ToTable("FmdSafetyAssessments", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.MealLog", b =>
                 {
                     b.Property<Guid>("Id")
@@ -345,6 +528,102 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("MealPlanDays", (string)null);
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.MealReplacementHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AppliedAllergiesCsv")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("AppliedExclusionsCsv")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("MealPlanDayId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("MealPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("PlannedMealId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("PreviousCandidateCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<decimal>("PreviousScore")
+                        .HasPrecision(8, 2)
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<string>("PreviousTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("ReasonSummary")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTimeOffset>("ReplacedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("ReplacementCandidateCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("ReplacementReasonCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<decimal>("ReplacementScore")
+                        .HasPrecision(8, 2)
+                        .HasColumnType("decimal(8,2)");
+
+                    b.Property<string>("ReplacementTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("RuleSetVersion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("SlotType")
+                        .IsRequired()
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("WeightProfileVersion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PlannedMealId", "ReplacedAt");
+
+                    b.HasIndex("UserId", "MealPlanId", "ReplacedAt");
+
+                    b.ToTable("MealReplacementHistories", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.PlannedMeal", b =>
                 {
                     b.Property<Guid>("Id")
@@ -471,6 +750,62 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("PlannedMeals", (string)null);
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.RecommendationFeedback", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CandidateCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("CandidateTitle")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("FeedbackType")
+                        .IsRequired()
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(600)
+                        .HasColumnType("nvarchar(600)");
+
+                    b.Property<Guid?>("PlannedMealId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ReasonCode")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("RuleSetVersion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("WeightProfileVersion")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "CandidateCode", "CreatedAt");
+
+                    b.ToTable("RecommendationFeedbacks", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.RefreshToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -590,6 +925,50 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("UserDietaryPreferences", (string)null);
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.UserFoodPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("DisplayLabel")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("FoodToken")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("PreferenceKind")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "FoodToken")
+                        .IsUnique();
+
+                    b.ToTable("UserFoodPreferences", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.UserProfile", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -625,6 +1004,17 @@ namespace LongevityDiet.Repositories.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("UserProfiles", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycleDay", b =>
+                {
+                    b.HasOne("LongevityDiet.Domain.Entities.FmdCycle", "FmdCycle")
+                        .WithMany("Days")
+                        .HasForeignKey("FmdCycleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("FmdCycle");
                 });
 
             modelBuilder.Entity("LongevityDiet.Domain.Entities.MealLogItem", b =>
@@ -680,6 +1070,11 @@ namespace LongevityDiet.Repositories.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycle", b =>
+                {
+                    b.Navigation("Days");
                 });
 
             modelBuilder.Entity("LongevityDiet.Domain.Entities.MealLog", b =>

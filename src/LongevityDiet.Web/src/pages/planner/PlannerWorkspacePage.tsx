@@ -5,11 +5,15 @@ import {
   CheckCircle2,
   Clock3,
   Edit3,
+  History,
+  Info,
   Leaf,
   Plus,
   RefreshCw,
   ShieldAlert,
   Sparkles,
+  ThumbsDown,
+  ThumbsUp,
   Trash2,
   UserRound,
   Utensils,
@@ -19,6 +23,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/authState'
 import { api } from '../../lib/api'
 import { getApiErrorMessage } from '../../lib/apiError'
+import { FmdWorkspaceSection } from './FmdWorkspaceSection'
 
 export type PlannedMealDto = {
   id: string
@@ -112,6 +117,112 @@ export type CandidateMealDto = {
   ingredients: string[]
 }
 
+export type RecommendationScoreComponentDto = {
+  componentCode: string
+  label: string
+  normalizedValue: number
+  weight: number
+  weightedDelta: number
+  isPenalty: boolean
+}
+
+export type RecommendationReasonDetailDto = {
+  reasonCode: string
+  title: string
+  explanation: string
+}
+
+export type RankedRecommendationCandidateDto = {
+  rank: number
+  candidateCode: string
+  title: string
+  description: string
+  cuisine: string
+  servingSize: number
+  servingUnit: string
+  caloriesKcal: number
+  proteinGrams: number
+  carbsGrams: number
+  fatGrams: number
+  fiberGrams: number
+  isPlantBased: boolean
+  hasLegumes: boolean
+  hasWholeGrains: boolean
+  containsFish: boolean
+  allergens: string[]
+  ingredients: string[]
+  finalScore: number
+  isDisliked: boolean
+  isPreferred: boolean
+  scoreComponents: RecommendationScoreComponentDto[]
+  reasonCodes: string[]
+  reasonDetails: RecommendationReasonDetailDto[]
+  deterministicExplanation: string
+  explanationText: string
+  explanationSource: string
+}
+
+export type RejectedRecommendationCandidateDto = {
+  candidateCode: string
+  title: string
+  rejectionReasonCodes: string[]
+  rejectionExplanation: string
+}
+
+export type RecommendationCatalogResultDto = {
+  contractVersion: string
+  ruleSetVersion: string
+  weightProfileVersion: string
+  targetSlot: string
+  dietaryPattern: string
+  appliedAllergies: string[]
+  appliedExclusions: string[]
+  dislikedTokens: string[]
+  preferredTokens: string[]
+  acceptedCandidates: RankedRecommendationCandidateDto[]
+  rejectedCandidates: RejectedRecommendationCandidateDto[]
+}
+
+export type UserFoodPreferenceDto = {
+  id: string
+  userId: string
+  foodToken: string
+  displayLabel: string
+  preferenceKind: 'Preferred' | 'Disliked' | 'ExplicitExclusion' | string
+  source: string
+  notes: string | null
+  updatedAt: string
+}
+
+export type MealReplacementHistoryDto = {
+  id: string
+  userId: string
+  mealPlanId: string
+  mealPlanDayId: string
+  plannedMealId: string
+  dayNumber: number
+  slotType: string
+  previousCandidateCode: string
+  previousTitle: string
+  previousScore: number
+  replacementCandidateCode: string
+  replacementTitle: string
+  replacementScore: number
+  replacementReasonCode: string
+  reasonSummary: string
+  appliedAllergies: string[]
+  appliedExclusions: string[]
+  ruleSetVersion: string
+  weightProfileVersion: string
+  replacedAt: string
+}
+
+export type ReplacePlannedMealResultDto = {
+  updatedPlan: MealPlanDto
+  replacedMeal: PlannedMealDto
+  replacementAudit: MealReplacementHistoryDto
+}
+
 export type MealLogItemDto = {
   id: string
   foodCode: string | null
@@ -186,6 +297,12 @@ const SLOT_LABELS: Record<string, string> = {
   Snack: 'Bữa phụ',
 }
 
+const PREFERENCE_KIND_LABELS: Record<string, string> = {
+  Preferred: 'Yêu thích (+Điểm ưu tiên)',
+  Disliked: 'Không thích (-Điểm mềm, không cấm)',
+  ExplicitExclusion: 'Loại trừ cứng (Cấm tuyệt đối)',
+}
+
 function getTodayIsoDate() {
   const now = new Date()
   const year = now.getFullYear()
@@ -250,6 +367,14 @@ export function PlannerWorkspacePage() {
   const [plannerFeedback, setPlannerFeedback] = useState<string | null>(null)
   const [plannerError, setPlannerError] = useState<string | null>(null)
 
+  // Week 2 - Task 3 state: Recommendation v2 drawer + Food Preferences + Feedback
+  const [inspectedMealId, setInspectedMealId] = useState<string | null>(null)
+  const [prefTokenInput, setPrefTokenInput] = useState('')
+  const [prefKindInput, setPrefKindInput] = useState('Disliked')
+  const [prefNotesInput, setPrefNotesInput] = useState('')
+  const [recFeedbackMessage, setRecFeedbackMessage] = useState<string | null>(null)
+  const [recErrorMessage, setRecErrorMessage] = useState<string | null>(null)
+
   const [editingLogId, setEditingLogId] = useState<string | null>(null)
   const [logMealType, setLogMealType] = useState('Breakfast')
   const [logEatenAt, setLogEatenAt] = useState(`${todayIso}T07:30`)
@@ -295,6 +420,38 @@ export function PlannerWorkspacePage() {
         throw err
       }
     },
+  })
+
+  const plan = currentPlanQuery.data
+
+  const inspectedRecommendationsQuery = useQuery({
+    queryKey: ['recommendations-for-meal', plan?.id, inspectedMealId],
+    enabled: Boolean(plan?.id && inspectedMealId),
+    queryFn: async () =>
+      (
+        await api.get<RecommendationCatalogResultDto>('/recommendations', {
+          params: {
+            mealPlanId: plan?.id,
+            plannedMealId: inspectedMealId,
+          },
+        })
+      ).data,
+  })
+
+  const foodPreferencesQuery = useQuery({
+    queryKey: ['user-food-preferences'],
+    queryFn: async () =>
+      (await api.get<UserFoodPreferenceDto[]>('/recommendations/preferences')).data,
+  })
+
+  const replacementHistoryQuery = useQuery({
+    queryKey: ['meal-replacement-history', plan?.id],
+    queryFn: async () =>
+      (
+        await api.get<MealReplacementHistoryDto[]>('/recommendations/replacements', {
+          params: { mealPlanId: plan?.id, limit: 20 },
+        })
+      ).data,
   })
 
   const eatingWindowQuery = useQuery({
@@ -353,8 +510,10 @@ export function PlannerWorkspacePage() {
         `Đã tạo kế hoạch 7 ngày (Phiên bản #${data.revisionNumber} • ${data.ruleSetVersion}).`,
       )
       setSelectedDayIndex(0)
+      setInspectedMealId(null)
       queryClient.setQueryData(['meal-plan-current'], data)
       void queryClient.invalidateQueries({ queryKey: ['meal-plan-preferences'] })
+      void queryClient.invalidateQueries({ queryKey: ['meal-replacement-history'] })
     },
     onError: (err) => {
       setPlannerFeedback(null)
@@ -372,6 +531,7 @@ export function PlannerWorkspacePage() {
       setPlannerFeedback(
         `Đã làm mới kế hoạch 7 ngày sang phiên bản #${data.revisionNumber}.`,
       )
+      setInspectedMealId(null)
       queryClient.setQueryData(['meal-plan-current'], data)
     },
     onError: (err) => {
@@ -380,22 +540,115 @@ export function PlannerWorkspacePage() {
     },
   })
 
-  const regenerateMealMutation = useMutation({
-    mutationFn: async ({ planId, mealId }: { planId: string; mealId: string }) => {
-      const response = await api.post<MealPlanDto>(
-        `/meal-plans/${planId}/meals/${mealId}/regenerate`,
-        {},
+  const replaceMealMutation = useMutation({
+    mutationFn: async ({
+      planId,
+      mealId,
+      targetCandidateCode,
+      replacementReasonCode,
+    }: {
+      planId: string
+      mealId: string
+      targetCandidateCode?: string | null
+      replacementReasonCode?: string
+    }) => {
+      const response = await api.post<ReplacePlannedMealResultDto>(
+        `/meal-plans/${planId}/meals/${mealId}/replace`,
+        {
+          targetCandidateCode: targetCandidateCode ?? null,
+          replacementReasonCode: replacementReasonCode ?? 'USER_REQUESTED_VARIETY',
+        },
       )
       return response.data
     },
     onSuccess: (data) => {
       setPlannerError(null)
-      setPlannerFeedback('Đã đổi sang món ăn thay thế an toàn tiếp theo.')
-      queryClient.setQueryData(['meal-plan-current'], data)
+      setPlannerFeedback(
+        `Đã đổi món thành công: "${data.replacementAudit.previousTitle}" → "${data.replacedMeal.title}" (Điểm ${data.replacedMeal.deterministicScore}).`,
+      )
+      queryClient.setQueryData(['meal-plan-current'], data.updatedPlan)
+      void queryClient.invalidateQueries({ queryKey: ['recommendations-for-meal'] })
+      void queryClient.invalidateQueries({ queryKey: ['meal-replacement-history'] })
     },
     onError: (err) => {
       setPlannerFeedback(null)
       setPlannerError(getApiErrorMessage(err, 'Không thể đổi món ăn lúc này.'))
+    },
+  })
+
+  const submitFeedbackMutation = useMutation({
+    mutationFn: async ({
+      candidateCode,
+      feedbackType,
+      plannedMealId,
+    }: {
+      candidateCode: string
+      feedbackType: 'Like' | 'Dislike'
+      plannedMealId?: string
+    }) => {
+      const response = await api.post('/recommendations/feedback', {
+        candidateCode,
+        feedbackType,
+        reasonCode: feedbackType === 'Like' ? 'TASTE_MATCH' : 'DISLIKE_FLAVOR',
+        plannedMealId: plannedMealId ?? null,
+      })
+      return response.data
+    },
+    onSuccess: (_data, variables) => {
+      setRecErrorMessage(null)
+      const actionLabel =
+        variables.feedbackType === 'Like'
+          ? 'Đã ghi nhận Yêu thích (+ưu tiên mềm)'
+          : 'Đã ghi nhận Không thích (giảm bậc ưu tiên mềm, không xóa cứng)'
+      setPlannerFeedback(`${actionLabel} cho mã món ${variables.candidateCode}.`)
+      setRecFeedbackMessage(`${actionLabel} cho mã món ${variables.candidateCode}.`)
+      void queryClient.invalidateQueries({ queryKey: ['user-food-preferences'] })
+      void queryClient.invalidateQueries({ queryKey: ['recommendations-for-meal'] })
+    },
+    onError: (err) => {
+      setRecErrorMessage(getApiErrorMessage(err, 'Không thể gửi phản hồi gợi ý.'))
+    },
+  })
+
+  const upsertFoodPreferenceMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.post<UserFoodPreferenceDto>('/recommendations/preferences', {
+        foodToken: prefTokenInput.trim(),
+        preferenceKind: prefKindInput,
+        displayLabel: prefTokenInput.trim(),
+        notes: prefNotesInput.trim() || null,
+      })
+      return response.data
+    },
+    onSuccess: (saved) => {
+      setRecErrorMessage(null)
+      setRecFeedbackMessage(
+        `Đã lưu "${saved.displayLabel}" vào nhóm ${PREFERENCE_KIND_LABELS[saved.preferenceKind] ?? saved.preferenceKind}.`,
+      )
+      setPrefTokenInput('')
+      setPrefNotesInput('')
+      void queryClient.invalidateQueries({ queryKey: ['user-food-preferences'] })
+      void queryClient.invalidateQueries({ queryKey: ['meal-plan-preferences'] })
+      void queryClient.invalidateQueries({ queryKey: ['recommendations-for-meal'] })
+    },
+    onError: (err) => {
+      setRecFeedbackMessage(null)
+      setRecErrorMessage(getApiErrorMessage(err, 'Không thể lưu tùy chỉnh thực phẩm.'))
+    },
+  })
+
+  const removeFoodPreferenceMutation = useMutation({
+    mutationFn: async (foodToken: string) => {
+      await api.delete(`/recommendations/preferences/${encodeURIComponent(foodToken)}`)
+    },
+    onSuccess: () => {
+      setRecErrorMessage(null)
+      setRecFeedbackMessage('Đã xóa mục tùy chỉnh sở thích/loại trừ.')
+      void queryClient.invalidateQueries({ queryKey: ['user-food-preferences'] })
+      void queryClient.invalidateQueries({ queryKey: ['recommendations-for-meal'] })
+    },
+    onError: (err) => {
+      setRecErrorMessage(getApiErrorMessage(err, 'Không thể xóa mục tùy chỉnh.'))
     },
   })
 
@@ -569,7 +822,6 @@ export function PlannerWorkspacePage() {
     setLogError(null)
   }
 
-  const plan = currentPlanQuery.data
   const activeDay =
     plan && plan.days.length > 0
       ? plan.days[Math.min(selectedDayIndex, plan.days.length - 1)]
@@ -591,7 +843,9 @@ export function PlannerWorkspacePage() {
         <nav className="nav-links" aria-label="Điều hướng ứng dụng">
           <a className="active" href="#eating-window">Khung giờ ăn</a>
           <a href="#meal-planner">Thực đơn 7 ngày</a>
+          <a href="#recommendation-v2">Gợi ý & Đổi món v2</a>
           <a href="#meal-logger">Nhật ký bữa ăn</a>
+          <a href="#fmd-tracker">Chu kỳ FMD 5 ngày</a>
           <Link to="/">Trang giới thiệu</Link>
         </nav>
 
@@ -695,11 +949,11 @@ export function PlannerWorkspacePage() {
           ) : null}
         </section>
 
-        {/* 7-DAY DETERMINISTIC MEAL PLANNER SECTION */}
+        {/* 7-DAY DETERMINISTIC MEAL PLANNER + RECOMMENDATION V2 REPLACEMENT */}
         <section className="workspace-section" id="meal-planner">
           <div className="section-heading">
             <div>
-              <span className="eyebrow">KẾ HOẠCH BỮA ĂN TẤT ĐỊNH (PLANNER V1)</span>
+              <span className="eyebrow">KẾ HOẠCH BỮA ĂN & GỢI Ý THAY THẾ (PLANNER + GRPC V2)</span>
               <h2>Thực đơn 7 ngày cá nhân hóa theo nguyên tắc trường thọ.</h2>
             </div>
           </div>
@@ -862,7 +1116,10 @@ export function PlannerWorkspacePage() {
                     role="tab"
                     aria-selected={idx === selectedDayIndex}
                     className={`day-tab ${idx === selectedDayIndex ? 'active' : ''}`}
-                    onClick={() => setSelectedDayIndex(idx)}
+                    onClick={() => {
+                      setSelectedDayIndex(idx)
+                      setInspectedMealId(null)
+                    }}
                   >
                     <span>Ngày {day.dayNumber}</span>
                     <strong>{day.planDate.slice(5)}</strong>
@@ -884,102 +1141,453 @@ export function PlannerWorkspacePage() {
                   </div>
 
                   <div className="planned-meals-grid">
-                    {activeDay.meals.map((meal) => (
-                      <article
-                        key={meal.id}
-                        className="surface-card planned-meal-card"
-                        data-testid={`planned-meal-card-${meal.slotType.toLowerCase()}`}
-                      >
-                        <div className="planned-meal-top">
-                          <span className="slot-badge">
-                            <Clock3 size={13} /> {SLOT_LABELS[meal.slotType] ?? meal.slotType} •{' '}
-                            {formatShortTime(meal.plannedTime)}
-                          </span>
-                          <span className="score-badge" title="Điểm quy tắc tất định">
-                            Điểm: {meal.deterministicScore}
-                          </span>
-                        </div>
-
-                        <h4 className="planned-meal-title">{meal.title}</h4>
-                        <p className="planned-meal-desc">{meal.description}</p>
-
-                        <div className="macro-strip">
-                          <span>
-                            <strong>{meal.caloriesKcal}</strong> kcal
-                          </span>
-                          <span>
-                            Đạm: <strong>{meal.proteinGrams}g</strong>
-                          </span>
-                          <span>
-                            Tinh bột: <strong>{meal.carbsGrams}g</strong>
-                          </span>
-                          <span>
-                            Béo: <strong>{meal.fatGrams}g</strong>
-                          </span>
-                          <span>
-                            Xơ: <strong>{meal.fiberGrams}g</strong>
-                          </span>
-                        </div>
-
-                        <div className="reason-tags">
-                          {meal.isPlantBased && (
-                            <span className="reason-chip">
-                              <Leaf size={12} /> Thực vật
+                    {activeDay.meals.map((meal) => {
+                      const isInspected = inspectedMealId === meal.id
+                      return (
+                        <article
+                          key={meal.id}
+                          className="surface-card planned-meal-card"
+                          data-testid={`planned-meal-card-${meal.slotType.toLowerCase()}`}
+                        >
+                          <div className="planned-meal-top">
+                            <span className="slot-badge">
+                              <Clock3 size={13} /> {SLOT_LABELS[meal.slotType] ?? meal.slotType} •{' '}
+                              {formatShortTime(meal.plannedTime)}
                             </span>
-                          )}
-                          {meal.hasLegumes && <span className="reason-chip">Đậu & Hạt</span>}
-                          {meal.hasWholeGrains && (
-                            <span className="reason-chip">Ngũ cốc nguyên hạt</span>
-                          )}
-                          {meal.containsFish && <span className="reason-chip">Cá Omega-3</span>}
-                          {meal.reasonCodes.map((code) => (
-                            <span key={code} className="reason-code-chip">
-                              {code}
+                            <span className="score-badge" title="Điểm quy tắc tất định">
+                              Điểm: {meal.deterministicScore}
                             </span>
-                          ))}
-                        </div>
+                          </div>
 
-                        <p className="meal-explanation">{meal.explanationSummary}</p>
+                          <h4 className="planned-meal-title">{meal.title}</h4>
+                          <p className="planned-meal-desc">{meal.description}</p>
 
-                        <div className="planned-meal-actions">
-                          <button
-                            type="button"
-                            className="secondary-button small-button"
-                            disabled={regenerateMealMutation.isPending}
-                            onClick={() =>
-                              regenerateMealMutation.mutate({
-                                planId: plan.id,
-                                mealId: meal.id,
-                              })
-                            }
-                          >
-                            <RefreshCw size={14} />
-                            Đổi món khác
-                            {meal.regenerationCount > 0 ? ` (${meal.regenerationCount})` : ''}
-                          </button>
+                          <div className="macro-strip">
+                            <span>
+                              <strong>{meal.caloriesKcal}</strong> kcal
+                            </span>
+                            <span>
+                              Đạm: <strong>{meal.proteinGrams}g</strong>
+                            </span>
+                            <span>
+                              Tinh bột: <strong>{meal.carbsGrams}g</strong>
+                            </span>
+                            <span>
+                              Béo: <strong>{meal.fatGrams}g</strong>
+                            </span>
+                            <span>
+                              Xơ: <strong>{meal.fiberGrams}g</strong>
+                            </span>
+                          </div>
 
-                          <button
-                            type="button"
-                            className="primary-button small-button"
-                            disabled={quickLogPlannedMealMutation.isPending}
-                            onClick={() =>
-                              quickLogPlannedMealMutation.mutate({
-                                dayDate: activeDay.planDate,
-                                meal,
-                              })
-                            }
-                          >
-                            <Plus size={14} />
-                            Ghi nhận đã ăn
-                          </button>
-                        </div>
-                      </article>
-                    ))}
+                          <div className="reason-tags">
+                            {meal.isPlantBased && (
+                              <span className="reason-chip">
+                                <Leaf size={12} /> Thực vật
+                              </span>
+                            )}
+                            {meal.hasLegumes && <span className="reason-chip">Đậu & Hạt</span>}
+                            {meal.hasWholeGrains && (
+                              <span className="reason-chip">Ngũ cốc nguyên hạt</span>
+                            )}
+                            {meal.containsFish && <span className="reason-chip">Cá Omega-3</span>}
+                            {meal.reasonCodes.map((code) => (
+                              <span key={code} className="reason-code-chip">
+                                {code}
+                              </span>
+                            ))}
+                          </div>
+
+                          <p className="meal-explanation">{meal.explanationSummary}</p>
+
+                          {/* FEEDBACK & WHY THIS RECOMMENDATION ROW */}
+                          <div className="meal-feedback-strip">
+                            <button
+                              type="button"
+                              className="feedback-pill-btn"
+                              disabled={submitFeedbackMutation.isPending}
+                              onClick={() =>
+                                submitFeedbackMutation.mutate({
+                                  candidateCode: meal.candidateCode,
+                                  feedbackType: 'Like',
+                                  plannedMealId: meal.id,
+                                })
+                              }
+                            >
+                              <ThumbsUp size={13} /> Thích
+                            </button>
+                            <button
+                              type="button"
+                              className="feedback-pill-btn"
+                              disabled={submitFeedbackMutation.isPending}
+                              onClick={() =>
+                                submitFeedbackMutation.mutate({
+                                  candidateCode: meal.candidateCode,
+                                  feedbackType: 'Dislike',
+                                  plannedMealId: meal.id,
+                                })
+                              }
+                            >
+                              <ThumbsDown size={13} /> Không thích
+                            </button>
+                            <button
+                              type="button"
+                              className={`feedback-pill-btn ${isInspected ? 'active' : ''}`}
+                              onClick={() =>
+                                setInspectedMealId(isInspected ? null : meal.id)
+                              }
+                            >
+                              <Info size={13} /> Vì sao gợi ý này? / Chọn món đổi
+                            </button>
+                          </div>
+
+                          <div className="planned-meal-actions">
+                            <button
+                              type="button"
+                              className="secondary-button small-button"
+                              disabled={replaceMealMutation.isPending}
+                              onClick={() =>
+                                replaceMealMutation.mutate({
+                                  planId: plan.id,
+                                  mealId: meal.id,
+                                })
+                              }
+                            >
+                              <RefreshCw size={14} />
+                              Đổi món khác
+                              {meal.regenerationCount > 0 ? ` (${meal.regenerationCount})` : ''}
+                            </button>
+
+                            <button
+                              type="button"
+                              className="primary-button small-button"
+                              disabled={quickLogPlannedMealMutation.isPending}
+                              onClick={() =>
+                                quickLogPlannedMealMutation.mutate({
+                                  dayDate: activeDay.planDate,
+                                  meal,
+                                })
+                              }
+                            >
+                              <Plus size={14} />
+                              Ghi nhận đã ăn
+                            </button>
+                          </div>
+                        </article>
+                      )
+                    })}
                   </div>
+
+                  {/* EXPANDED RECOMMENDATION V2 EXPLANATION & REPLACEMENT DRAWER */}
+                  {inspectedMealId && (
+                    <div
+                      className="surface-card recommendation-inspector-card"
+                      data-testid="recommendation-inspector"
+                    >
+                      <div className="inspector-header">
+                        <div>
+                          <span className="micro-label">
+                            GỢI Ý THAY THẾ & GIẢI THÍCH TẤT ĐỊNH (GRPC RECOMMENDATION V2)
+                          </span>
+                          <h3>
+                            Vì sao gợi ý món này & Danh sách món thay thế an toàn
+                          </h3>
+                        </div>
+                        <button
+                          type="button"
+                          className="secondary-button small-button"
+                          onClick={() => setInspectedMealId(null)}
+                        >
+                          Đóng bảng gợi ý
+                        </button>
+                      </div>
+
+                      {inspectedRecommendationsQuery.isLoading ? (
+                        <p className="status-text" role="status">
+                          Đang xếp hạng món ăn qua engine Recommendation v2...
+                        </p>
+                      ) : inspectedRecommendationsQuery.isError ? (
+                        <p className="form-error" role="alert">
+                          {getApiErrorMessage(
+                            inspectedRecommendationsQuery.error,
+                            'Không thể tải danh sách gợi ý thay thế.',
+                          )}
+                        </p>
+                      ) : inspectedRecommendationsQuery.data ? (
+                        <div className="inspector-body">
+                          <div className="inspector-meta-strip">
+                            <span className="meta-badge">
+                              Bộ quy tắc: {inspectedRecommendationsQuery.data.ruleSetVersion}
+                            </span>
+                            <span className="meta-badge">
+                              Trọng số: {inspectedRecommendationsQuery.data.weightProfileVersion}
+                            </span>
+                            <span className="meta-badge">
+                              Khung bữa:{' '}
+                              {SLOT_LABELS[inspectedRecommendationsQuery.data.targetSlot] ??
+                                inspectedRecommendationsQuery.data.targetSlot}
+                            </span>
+                          </div>
+
+                          <div className="inspector-candidates-list">
+                            {inspectedRecommendationsQuery.data.acceptedCandidates.map(
+                              (candidate) => (
+                                <div
+                                  key={candidate.candidateCode}
+                                  className="inspector-candidate-row"
+                                >
+                                  <div className="inspector-candidate-main">
+                                    <div className="inspector-candidate-title-row">
+                                      <span className="rank-pill">Hạng #{candidate.rank}</span>
+                                      <strong>{candidate.title}</strong>
+                                      <span className="score-badge">
+                                        {candidate.finalScore} điểm
+                                      </span>
+                                      {candidate.isPreferred && (
+                                        <span className="meta-badge">Yêu thích</span>
+                                      )}
+                                      {candidate.isDisliked && (
+                                        <span className="meta-badge warn-badge">
+                                          Không thích (Đã trừ điểm mềm)
+                                        </span>
+                                      )}
+                                    </div>
+                                    <p className="inspector-explanation">
+                                      {candidate.explanationText}
+                                    </p>
+                                    <div className="score-breakdown-chips">
+                                      {candidate.scoreComponents.map((comp) => (
+                                        <span
+                                          key={comp.componentCode}
+                                          className={`score-comp-chip ${comp.isPenalty ? 'penalty' : ''}`}
+                                        >
+                                          {comp.label}:{' '}
+                                          <strong>
+                                            {comp.weightedDelta >= 0
+                                              ? `+${comp.weightedDelta}`
+                                              : comp.weightedDelta}
+                                          </strong>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  <div className="inspector-candidate-actions">
+                                    <button
+                                      type="button"
+                                      className="primary-button small-button"
+                                      disabled={replaceMealMutation.isPending}
+                                      onClick={() =>
+                                        replaceMealMutation.mutate({
+                                          planId: plan.id,
+                                          mealId: inspectedMealId,
+                                          targetCandidateCode: candidate.candidateCode,
+                                          replacementReasonCode: 'USER_SELECTED_CANDIDATE',
+                                        })
+                                      }
+                                    >
+                                      <RefreshCw size={13} /> Chọn đổi sang món này
+                                    </button>
+                                  </div>
+                                </div>
+                              ),
+                            )}
+                          </div>
+
+                          {inspectedRecommendationsQuery.data.rejectedCandidates.length > 0 && (
+                            <div className="rejected-candidates-box">
+                              <span className="micro-label">
+                                CÁC MÓN ĐÃ BỊ LOẠI BỞI RÀNG BUỘC CỨNG (HARD CONSTRAINTS)
+                              </span>
+                              <div className="rejected-list">
+                                {inspectedRecommendationsQuery.data.rejectedCandidates.map(
+                                  (rej) => (
+                                    <div key={rej.candidateCode} className="rejected-item">
+                                      <strong>{rej.title}</strong>
+                                      <span>{rej.rejectionExplanation}</span>
+                                    </div>
+                                  ),
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           )}
+        </section>
+
+        {/* WEEK 2 TASK 3: PREFERENCES / DISLIKE VS EXCLUSION & AUDIT REPLACEMENT HISTORY */}
+        <section className="workspace-section" id="recommendation-v2">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">CÁ NHÂN HÓA GỢI Ý V2 & KIỂM TOÁN ĐỔI MÓN</span>
+              <h2>Tùy chỉnh Yêu thích / Không thích / Loại trừ cứng và lịch sử đổi món.</h2>
+            </div>
+          </div>
+
+          <div className="logger-layout">
+            {/* FOOD PREFERENCES VS EXPLICIT EXCLUSION */}
+            <div className="surface-card logger-form-card">
+              <div className="card-heading">
+                <span className="icon-box">
+                  <Sparkles size={18} strokeWidth={1.6} />
+                </span>
+                <div>
+                  <span className="micro-label">PHÂN TÁCH DISLIKE MỀM & LOẠI TRỪ CỨNG</span>
+                  <h3>Cài đặt Sở thích / Không thích / Loại trừ</h3>
+                </div>
+              </div>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (prefTokenInput.trim()) {
+                    upsertFoodPreferenceMutation.mutate()
+                  }
+                }}
+              >
+                <div className="profile-grid">
+                  <label className="field">
+                    <span>Mã món hoặc nguyên liệu</span>
+                    <input
+                      aria-label="Mã món hoặc nguyên liệu"
+                      className="plain-input"
+                      placeholder="Ví dụ: salmon, tofu, mushroom..."
+                      required
+                      value={prefTokenInput}
+                      onChange={(e) => setPrefTokenInput(e.target.value)}
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Mức độ tác động</span>
+                    <select
+                      aria-label="Mức độ tác động"
+                      className="plain-input"
+                      value={prefKindInput}
+                      onChange={(e) => setPrefKindInput(e.target.value)}
+                    >
+                      <option value="Preferred">Yêu thích (+8 điểm ưu tiên mềm)</option>
+                      <option value="Disliked">Không thích (-18 điểm mềm, không cấm cứng)</option>
+                      <option value="ExplicitExclusion">Loại trừ cứng (Cấm tuyệt đối)</option>
+                    </select>
+                  </label>
+
+                  <label className="field span-2">
+                    <span>Ghi chú lý do (tùy chọn)</span>
+                    <input
+                      aria-label="Ghi chú lý do"
+                      className="plain-input"
+                      placeholder="Ví dụ: Không hợp vị hoặc muốn tránh hoàn toàn..."
+                      value={prefNotesInput}
+                      onChange={(e) => setPrefNotesInput(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                {recErrorMessage && (
+                  <p className="form-error" role="alert">
+                    {recErrorMessage}
+                  </p>
+                )}
+                {recFeedbackMessage && (
+                  <p className="form-success" role="status">
+                    {recFeedbackMessage}
+                  </p>
+                )}
+
+                <div className="logger-form-actions">
+                  <button
+                    type="submit"
+                    className="primary-button"
+                    disabled={upsertFoodPreferenceMutation.isPending}
+                  >
+                    <Plus size={16} /> Lưu tùy chỉnh gợi ý
+                  </button>
+                </div>
+              </form>
+
+              <div className="preference-items-list">
+                {foodPreferencesQuery.data && foodPreferencesQuery.data.length > 0 ? (
+                  foodPreferencesQuery.data.map((pref) => (
+                    <div key={pref.id} className="meal-log-item-row">
+                      <div className="meal-log-info-col">
+                        <strong>{pref.displayLabel}</strong>
+                        <p>
+                          {PREFERENCE_KIND_LABELS[pref.preferenceKind] ?? pref.preferenceKind} •
+                          Nguồn: {pref.source}
+                        </p>
+                        {pref.notes && <small className="log-note">{pref.notes}</small>}
+                      </div>
+                      <div className="meal-log-actions-col">
+                        <button
+                          type="button"
+                          className="icon-action-btn danger"
+                          aria-label={`Xóa ${pref.foodToken}`}
+                          onClick={() => removeFoodPreferenceMutation.mutate(pref.foodToken)}
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="status-text">
+                    Chưa có mục Yêu thích / Không thích / Loại trừ riêng nào.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* MEAL REPLACEMENT AUDIT HISTORY */}
+            <div className="surface-card logger-history-card">
+              <div className="card-heading">
+                <span className="icon-box">
+                  <History size={18} strokeWidth={1.6} />
+                </span>
+                <div>
+                  <span className="micro-label">KIỂM TOÁN LỊCH SỬ ĐỔI MÓN (AUDIT TRAIL)</span>
+                  <h3>Lịch sử thay thế bữa ăn trong thực đơn</h3>
+                </div>
+              </div>
+
+              {!replacementHistoryQuery.data || replacementHistoryQuery.data.length === 0 ? (
+                <div className="empty-history">
+                  <p>
+                    Chưa có lịch sử đổi món nào. Hãy nhấn <strong>Đổi món khác</strong> trên thực
+                    đơn 7 ngày để xem bản ghi kiểm toán tại đây.
+                  </p>
+                </div>
+              ) : (
+                <div className="meal-log-list" data-testid="replacement-history-list">
+                  {replacementHistoryQuery.data.map((item) => (
+                    <div key={item.id} className="meal-log-item-row">
+                      <div className="meal-log-time-col">
+                        <strong>Ngày {item.dayNumber}</strong>
+                        <span>{SLOT_LABELS[item.slotType] ?? item.slotType}</span>
+                        <small>{item.ruleSetVersion}</small>
+                      </div>
+                      <div className="meal-log-info-col">
+                        <strong>
+                          {item.previousTitle} → {item.replacementTitle}
+                        </strong>
+                        <p>
+                          Điểm: {item.previousScore} → {item.replacementScore} • Mã lý do:{' '}
+                          {item.replacementReasonCode}
+                        </p>
+                        <small className="log-note">{item.reasonSummary}</small>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
         {/* MEAL LOG FORM & HISTORY SECTION */}
@@ -1266,8 +1874,10 @@ export function PlannerWorkspacePage() {
             </div>
           </div>
         </section>
+
+        {/* FMD FASTING MIMICKING DIET & SAFETY GATE SECTION */}
+        <FmdWorkspaceSection />
       </main>
     </div>
   )
 }
-

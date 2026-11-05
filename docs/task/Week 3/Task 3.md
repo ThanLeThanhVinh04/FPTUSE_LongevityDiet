@@ -3,14 +3,13 @@
 **Owner:** Thành viên 3
 **Reviewer:** Thành viên 1
 **Branch:** `feature/w3-t3-fmd-safety-tracking`
-**Status:** Planned
+**Status:** Done
 
 ## Architecture alignment (ADR-005)
 
 - **Target owner:** Planning Service (`REST :8083`).
 - **Owned data:** FMD safety assessment/cycle state in `LongevityPlanningDb`.
 - **Guardrail:** backend safety state machine remains deterministic; Local AI cannot decide eligibility or therapeutic behavior.
-
 
 ## Mục tiêu
 
@@ -41,21 +40,21 @@ Backend phải enforce transition; UI không phải security boundary.
 
 ## API/UI
 
-- Education metadata + acknowledgement.
-- Assessment submit/current state.
+- Education metadata + acknowledgement (`GET /api/v1/fmd/education`, `POST /api/v1/fmd/education/acknowledge`).
+- Assessment submit/current state (`POST /api/v1/fmd/safety/assessment`, `GET /api/v1/fmd/safety/status`).
 - Eligibility/tracking state.
-- Start/get/update/stop/complete cycle + history.
-- Education, questionnaire, result, cycle tracker, warning/stop UI.
+- Start/get/update/stop/complete cycle + history (`POST /api/v1/fmd/cycles`, `GET /api/v1/fmd/cycles/active`, `POST /api/v1/fmd/cycles/{id}/days/{day}`, `POST /api/v1/fmd/cycles/{id}/stop`, `POST /api/v1/fmd/cycles/{id}/complete`, `GET /api/v1/fmd/cycles`).
+- UI hoàn chỉnh: `FmdWorkspaceSection.tsx` tích hợp trên `PlannerWorkspacePage.tsx`.
 
-## Testing bắt buộc
+## Testing bắt buộc đã hoàn thành
 
-- Blocking/high-risk flags.
-- Invalid state transition/direct API bypass.
-- Start without eligibility.
-- Eligibility revoked.
-- Duplicate active cycle.
-- Stop/complete/history immutability.
-- Ownership.
+- [x] Blocking/high-risk flags (`FmdSafetyAndCycleTests`, `FmdApiTests`).
+- [x] Invalid state transition/direct API bypass (`FmdApiTests.Fmd_SafetyWorkflow_EnforcesStateTransitionsAndBlocksHighRiskUsers`).
+- [x] Start without eligibility: blocked with 400/422.
+- [x] Eligibility revoked / ProfessionalReviewRequired blocks start.
+- [x] Duplicate active cycle: blocked with 409 Conflict.
+- [x] Stop/complete/history immutability.
+- [x] Ownership isolation: User B cannot access/log/stop User A's cycle.
 
 ## Definition of Done
 
