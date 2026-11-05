@@ -3,7 +3,7 @@
 **Owner:** Thành viên 2  
 **Reviewer:** Thành viên 4  
 **Branch:** `feature/w1-t2-catalog-rules`  
-**Status:** Not Started
+**Status:** Ready for Review
 
 ## Architecture alignment (ADR-005)
 
@@ -137,3 +137,18 @@ Collection API bắt buộc chứng minh:
 ## Definition of Done
 
 Fresh database migrate + seed thành công; Admin thay đổi catalog/rule và Member thấy đúng active/published state qua UI/API; REST contract/status/OpenAPI đúng; rubric CRUD/query có automated/runtime evidence; build/test pass.
+
+
+## Implementation Evidence — 2026-11-02
+
+- Implemented as a staged logical Catalog boundary inside the current canonical 7-project runtime, using the canonical `LongevityDietDbContext` and SQL schema `catalog`. No deployable Catalog microservice or `LongevityCatalogDb` is claimed.
+- Domain/persistence: Food, Recipe, ingredient/allergen mappings, DietRule/RuleVersion/RuleSetVersion, EF configurations, migration `20261102_CatalogFoundation`, deterministic/idempotent seed; reusable `RecipeAllergenExclusionPolicy` covers allergen exclusion checks for downstream consumers.
+- REST: authenticated Member catalog; Admin Food/Recipe create-update-deactivate; rule/version create-update-publish; RFC7807 errors; 201 + Location; 401/403/404/409 coverage; OpenAPI security/status metadata.
+- Query evidence: server-side search + filter + allow-listed sort + bounded pagination with deterministic Id tie-breaker; automated integration coverage includes combined search/filter/sort/pagination.
+- Frontend: Member catalog with search/filter/sort/pagination, recipe/allergen detail, rule provenance; Admin Food/Recipe CRUD flow and RuleVersion create/publish workflow; loading/empty/error states; role-based Admin navigation/route.
+- Event boundary prepared as versioned contracts only: `FoodCatalogChanged.v1`, `RecipeCatalogChanged.v1`, `RuleVersionPublished.v1`, `RuleSetActivated.v1`. No competing Outbox/broker pipeline was added.
+- Fresh SQL Server LocalDB verification: 4 Foods, 2 Recipes, 2 Allergens, 2 DietRules, 2 RuleVersions, 1 active RuleSet, 2 applied migrations; API `/health` and OpenAPI GET returned 200. Verification database was removed afterward.
+- Final quality gates: project structure PASS; .NET build 0 warnings / 0 errors; unit tests 25/25; integration tests 17/17; frontend tests 6/6; frontend lint 0 warnings / 0 errors; production build PASS.
+- Docker full-stack smoke PASS: `docker compose up -d --build` completed; SQL Server and Redis reported healthy; API `/health` = 200, OpenAPI = 200, Web = 200, Redis `PING` = `PONG`; unauthenticated Member catalog returned 401 as expected.
+- Docker runtime Catalog evidence: API startup applied migration `20261102055955_20261102_CatalogFoundation`; authenticated Member smoke returned 4 Foods, 2 Recipes and 2 active DietRules from deterministic seed data. Existing Docker Playwright E2E also passed 1/1.
+- Pending process gate: reviewer (Thành viên 4) review/approval before changing this task to Done or beginning Week 2.

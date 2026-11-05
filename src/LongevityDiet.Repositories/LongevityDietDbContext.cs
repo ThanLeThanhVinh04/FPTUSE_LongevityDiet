@@ -1,3 +1,4 @@
+using LongevityDiet.Domain.Catalog.Entities;
 using LongevityDiet.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,14 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
     public DbSet<User> Users => Set<User>();
     public DbSet<UserProfile> UserProfiles => Set<UserProfile>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<Food> Foods => Set<Food>();
+    public DbSet<Recipe> Recipes => Set<Recipe>();
+    public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
+    public DbSet<Allergen> Allergens => Set<Allergen>();
+    public DbSet<RecipeAllergen> RecipeAllergens => Set<RecipeAllergen>();
+    public DbSet<DietRule> DietRules => Set<DietRule>();
+    public DbSet<RuleVersion> RuleVersions => Set<RuleVersion>();
+    public DbSet<RuleSetVersion> RuleSetVersions => Set<RuleSetVersion>();
     public DbSet<UserDietaryPreference> UserDietaryPreferences => Set<UserDietaryPreference>();
     public DbSet<MealPlan> MealPlans => Set<MealPlan>();
     public DbSet<MealPlanDay> MealPlanDays => Set<MealPlanDay>();
@@ -61,6 +70,7 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
         ConfigureTrackingModel(modelBuilder);
         ConfigureRecommendationModel(modelBuilder);
         ConfigureFmdModel(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(LongevityDietDbContext).Assembly);
     }
 
     private static void ConfigurePlanningModel(ModelBuilder modelBuilder)

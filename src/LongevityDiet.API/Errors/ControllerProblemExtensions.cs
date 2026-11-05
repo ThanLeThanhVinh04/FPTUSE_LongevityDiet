@@ -1,3 +1,4 @@
+using LongevityDiet.Services.Catalog;
 using LongevityDiet.Services.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,21 +47,41 @@ public static class ControllerProblemExtensions
             ["fmd_cycle_not_found"] = StatusCodes.Status404NotFound,
             ["fmd_day_not_found"] = StatusCodes.Status404NotFound,
             ["fmd_cycle_not_active"] = StatusCodes.Status400BadRequest,
+            ["food_not_found"] = StatusCodes.Status404NotFound,
+            ["recipe_not_found"] = StatusCodes.Status404NotFound,
+            ["rule_not_found"] = StatusCodes.Status404NotFound,
+            ["rule_version_not_found"] = StatusCodes.Status404NotFound,
+            ["active_rule_set_not_found"] = StatusCodes.Status404NotFound,
+            ["published_rule_immutable"] = StatusCodes.Status409Conflict,
+            ["rule_version_conflict"] = StatusCodes.Status409Conflict,
         };
 
     public static ObjectResult ToProblem<T>(
         this ControllerBase controller,
         ServiceResult<T> result,
-        int defaultStatusCode = StatusCodes.Status400BadRequest)
+        int defaultStatusCode = StatusCodes.Status400BadRequest) =>
+        ToProblemCore(controller, result.ErrorCode, result.ErrorMessage, defaultStatusCode);
+
+    public static ObjectResult ToProblem<T>(
+        this ControllerBase controller,
+        CatalogServiceResult<T> result,
+        int defaultStatusCode = StatusCodes.Status400BadRequest) =>
+        ToProblemCore(controller, result.ErrorCode, result.ErrorMessage, defaultStatusCode);
+
+    private static ObjectResult ToProblemCore(
+        ControllerBase controller,
+        string? errorCode,
+        string? errorMessage,
+        int defaultStatusCode)
     {
-        var statusCode = result.ErrorCode is not null &&
-                         StatusByErrorCode.TryGetValue(result.ErrorCode, out var mappedStatus)
+        var statusCode = errorCode is not null &&
+                         StatusByErrorCode.TryGetValue(errorCode, out var mappedStatus)
             ? mappedStatus
             : defaultStatusCode;
 
         return controller.Problem(
             statusCode: statusCode,
-            title: result.ErrorCode ?? "request_failed",
-            detail: result.ErrorMessage ?? "The request could not be completed.");
+            title: errorCode ?? "request_failed",
+            detail: errorMessage ?? "The request could not be completed.");
     }
 }

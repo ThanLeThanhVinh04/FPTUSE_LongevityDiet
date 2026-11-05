@@ -14,6 +14,18 @@ const RegisterPage = lazy(() =>
   import('./pages/auth/RegisterPage').then((module) => ({ default: module.RegisterPage })),
 )
 
+const CatalogPage = lazy(() =>
+  import('./features/catalog/CatalogPage').then((module) => ({ default: module.CatalogPage })),
+)
+
+const RecipeDetailPage = lazy(() =>
+  import('./features/catalog/RecipeDetailPage').then((module) => ({ default: module.RecipeDetailPage })),
+)
+
+const AdminCatalogPage = lazy(() =>
+  import('./features/admin/catalog/AdminCatalogPage').then((module) => ({ default: module.AdminCatalogPage })),
+)
+
 const profilePages = () => import('./pages/auth/ProfileEditorPage')
 
 const OnboardingPage = lazy(() =>
@@ -79,6 +91,33 @@ function App() {
           element={
             <ProtectedRoute>
               <PlannerWorkspacePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/catalog"
+          element={
+            <ProtectedRoute>
+              <CatalogPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/catalog/recipes/:id"
+          element={
+            <ProtectedRoute>
+              <RecipeDetailPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/catalog"
+          element={
+            <ProtectedRoute requiredRole="Admin">
+              <AdminCatalogPage />
             </ProtectedRoute>
           }
         />

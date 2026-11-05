@@ -5,11 +5,13 @@ import { useAuth } from './authState'
 type ProtectedRouteProps = {
   children: ReactNode
   allowIncompleteProfile?: boolean
+  requiredRole?: string
 }
 
 export function ProtectedRoute({
   children,
   allowIncompleteProfile = false,
+  requiredRole,
 }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth()
   const location = useLocation()
@@ -29,6 +31,10 @@ export function ProtectedRoute({
 
   if (!allowIncompleteProfile && !user.profileCompleted) {
     return <Navigate to="/onboarding" replace />
+  }
+
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to="/catalog" replace />
   }
 
   return children

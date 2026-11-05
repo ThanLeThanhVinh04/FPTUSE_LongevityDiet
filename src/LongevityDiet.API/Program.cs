@@ -5,7 +5,10 @@ using LongevityDiet.API.Recommendation;
 using LongevityDiet.API.Security;
 using LongevityDiet.Domain.Entities;
 using LongevityDiet.Repositories;
+using LongevityDiet.Repositories.Catalog.Repositories;
+using LongevityDiet.Repositories.Catalog.Seed;
 using LongevityDiet.Repositories.Repositories;
+using LongevityDiet.Services.Catalog;
 using LongevityDiet.Services.Identity;
 using LongevityDiet.Services.Fmd;
 using LongevityDiet.Services.Planning;
@@ -59,6 +62,9 @@ try
 
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+    builder.Services.AddScoped<IFoodRepository, FoodRepository>();
+    builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
+    builder.Services.AddScoped<IRuleCatalogRepository, RuleCatalogRepository>();
     builder.Services.AddScoped<IMealPlanRepository, MealPlanRepository>();
     builder.Services.AddScoped<IRecommendationRepository, RecommendationRepository>();
     builder.Services.AddScoped<IFmdRepository, FmdRepository>();
@@ -70,6 +76,9 @@ try
     builder.Services.AddScoped<SafeExplanationRewriter>();
     builder.Services.AddScoped<AuthenticationService>();
     builder.Services.AddScoped<ProfileService>();
+    builder.Services.AddScoped<FoodCatalogService>();
+    builder.Services.AddScoped<RecipeCatalogService>();
+    builder.Services.AddScoped<RuleCatalogService>();
     builder.Services.AddScoped<MealPlanningService>();
     builder.Services.AddScoped<RecommendationService>();
     builder.Services.AddScoped<FmdService>();
@@ -114,6 +123,7 @@ try
         await using var scope = app.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<LongevityDietDbContext>();
         await dbContext.Database.MigrateAsync();
+        await CatalogSeed.SeedAsync(dbContext);
     }
 
     app.UseSerilogRequestLogging();

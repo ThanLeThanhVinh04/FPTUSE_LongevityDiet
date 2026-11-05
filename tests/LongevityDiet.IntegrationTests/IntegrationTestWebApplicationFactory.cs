@@ -80,6 +80,21 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
         await dbContext.SaveChangesAsync();
     }
 
+    public async Task PromoteUserToAdminAsync(string email)
+    {
+        using var scope = Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<LongevityDietDbContext>();
+
+        var normalizedEmail = email.Trim().ToUpperInvariant();
+        var user = await dbContext.Users
+            .SingleAsync(x => x.NormalizedEmail == normalizedEmail);
+
+        user.Role = UserRole.Admin;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await dbContext.SaveChangesAsync();
+    }
+
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
