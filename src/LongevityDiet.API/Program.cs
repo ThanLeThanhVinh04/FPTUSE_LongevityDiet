@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text;
+using LongevityDiet.API.Infrastructure;
 using LongevityDiet.API.OpenApi;
 using LongevityDiet.API.Recommendation;
 using LongevityDiet.API.Security;
@@ -72,6 +73,7 @@ try
     builder.Services.AddScoped<IMealLogRepository, MealLogRepository>();
     builder.Services.AddScoped<IEatingWindowRepository, EatingWindowRepository>();
     builder.Services.AddScoped<IChallengeProgressRepository, ChallengeProgressRepository>();
+    builder.Services.AddScoped<IWeeklyReportWorkerRepository, WeeklyReportWorkerRepository>();
     builder.Services.AddScoped<IPlanningInputProvider, PlanningCatalogSnapshotProvider>();
     builder.Services.AddScoped<ITrackingUserScheduleProvider, TrackingUserScheduleProvider>();
     builder.Services.AddSingleton<IRecommendationEngineClient, GrpcRecommendationEngineClient>();
@@ -86,6 +88,9 @@ try
     builder.Services.AddScoped<FmdService>();
     builder.Services.AddScoped<MealTrackingService>();
     builder.Services.AddScoped<ChallengeProgressService>();
+    builder.Services.AddScoped<WeeklyReportService>();
+    builder.Services.AddScoped<WorkerReliabilityService>();
+    builder.Services.AddScoped<WeeklyReportStreamPublisher>();
     builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
     builder.Services.AddScoped<IAccessTokenProvider, JwtAccessTokenProvider>();
     builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();

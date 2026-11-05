@@ -32,6 +32,12 @@ const ChallengeDashboardPage = lazy(() =>
   })),
 )
 
+const WeeklyReportsPage = lazy(() =>
+  import('./features/reports/WeeklyReportsPage').then((module) => ({
+    default: module.WeeklyReportsPage,
+  })),
+)
+
 const profilePages = () => import('./pages/auth/ProfileEditorPage')
 
 const OnboardingPage = lazy(() =>
@@ -115,6 +121,15 @@ function App() {
           element={
             <ProtectedRoute>
               <ChallengeDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/reports"
+          element={
+            <ProtectedRoute>
+              <WeeklyReportsPage />
             </ProtectedRoute>
           }
         />
