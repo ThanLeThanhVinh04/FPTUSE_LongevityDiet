@@ -221,21 +221,31 @@ Against an already running Docker Compose full stack:
 npm run test:docker
 ```
 
-Current verified test baseline:
-- UnitTests: 8/8 pass.
-- IntegrationTests: 7/7 pass.
-- E2ETests: 1/1 pass on Chrome in native Visual Studio-style development.
-- Docker E2ETests: 1/1 pass against the fully containerized stack.
+Current verified baseline (2026-11-05):
+- UnitTests: 51/51 pass.
+- IntegrationTests: 35/38 pass. The 3 failures are a pre-existing MealLog-create HTTP 500 baseline defect reproduced on clean `origin/develop` commit `474b475`; see `docs/operations/RELEASE-RUNBOOK.md`.
+- Member 2 Week 2 targeted integration tests: 5/5 pass.
+- Member 2 Week 3 targeted integration tests: 5/5 pass.
+- Frontend tests: 6/6 pass; lint/build PASS.
+- Docker E2E: 1/1 previously verified against the current Compose runtime; release CI reruns it on pushes to `main`.
 - Full .NET build: 0 warnings, 0 errors.
-- Docker Compose build/runtime smoke: PASS.
+- Docker Compose build/runtime, Redis Stream Worker smoke, backup verification and named-volume persistence: PASS.
+
+The complete current-runtime operations and release evidence is documented in `docs/operations/RELEASE-RUNBOOK.md`. ADR-005 Gateway/domain-service/TLS topology remains **Target Architecture** until those deployables and service-owned databases exist.
 
 ## Deployment instructions
 
+For the verified current demo runtime, follow `docs/operations/RELEASE-RUNBOOK.md`.
+
 ```powershell
 Copy-Item .env.example .env
+# Replace every CHANGE_ME value in .env before startup.
 docker compose up -d --build
 docker compose ps
+.\scripts\Test-ReleaseReadiness.ps1 -RequireRunningStack
 ```
+
+The checked-in Compose file binds published ports to `127.0.0.1` for local/demo safety. It is not the target public HTTPS :443 deployment.
 
 Core containers:
 - web;

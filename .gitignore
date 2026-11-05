@@ -18,6 +18,7 @@ yarn-error.log*
 pnpm-debug.log*
 TestResults/
 coverage/
+.local-backups/
 .DS_Store
 **/test-results/
 **/playwright-report/

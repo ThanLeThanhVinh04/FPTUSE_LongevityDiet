@@ -7,7 +7,7 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD}
     ports:
-      - "${SQLSERVER_PORT:-14330}:1433"
+      - "127.0.0.1:${SQLSERVER_PORT:-14330}:1433"
     volumes:
       - sql-data:/var/opt/mssql
     healthcheck:
@@ -22,7 +22,7 @@ services:
     image: redis:7-alpine
     command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - redis-data:/data
     healthcheck:
@@ -41,7 +41,7 @@ services:
       ASPNETCORE_URLS: http://+:8081
       Kestrel__EndpointDefaults__Protocols: Http2
     ports:
-      - "${GRPC_PORT:-8081}:8081"
+      - "127.0.0.1:${GRPC_PORT:-8081}:8081"
     networks: [ldc-network]
 
   api:
@@ -58,7 +58,7 @@ services:
       Jwt__Audience: ${JWT_AUDIENCE}
       Jwt__SigningKey: ${JWT_SIGNING_KEY}
     ports:
-      - "${API_PORT:-8080}:8080"
+      - "127.0.0.1:${API_PORT:-8080}:8080"
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -88,7 +88,7 @@ services:
       context: .
       dockerfile: src/LongevityDiet.Web/Dockerfile
     ports:
-      - "${WEB_PORT:-5173}:80"
+      - "127.0.0.1:${WEB_PORT:-5173}:80"
     depends_on:
       - api
     networks: [ldc-network]

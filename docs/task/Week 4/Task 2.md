@@ -3,7 +3,7 @@
 **Owner:** Thành viên 2
 **Reviewer:** Thành viên 4
 **Branch:** `feature/w4-t2-release-readiness`
-**Status:** Planned
+**Status:** Ready for Review (current runtime verified; Target Architecture gaps documented)
 
 ## Architecture alignment (ADR-005)
 
@@ -107,3 +107,25 @@ Document và verify:
 ## Definition of Done
 
 Một clean environment có thể dựng **Target Architecture** bằng documented commands; migration/seed/Docker/config không phụ thuộc secret hoặc state ngầm trên máy developer; target communication matrix pass; `sql-data`/`redis-data` persistence được chứng minh; chỉ :443 public; và mọi target container/database trong C1 có runtime/Compose evidence. Nếu chưa đạt các điều này thì tài liệu phải tiếp tục ghi rõ Target, không được claim đã deploy.
+
+
+## Implementation Evidence — 2026-11-05
+
+- Release scope is explicitly split between **Current Runtime** and ADR-005 **Target Architecture**. This branch does not claim Gateway/4 domain REST services/six service-owned databases/public HTTPS :443 are deployed because those deployables do not exist in the repository.
+- Docker Compose hardening: every published local/demo port now binds to `127.0.0.1` only. Runtime `docker compose ps` confirmed Web `:5173`, API `:8080`, Recommendation gRPC `:8081`, Redis `:6379` and SQL `:14330` are loopback-bound; Worker has no published port.
+- Persistence placement: SQL uses named volume `longevity-diet-sqlserver-data` mounted at `/var/opt/mssql`; Redis uses `longevity-diet-redis-data` mounted at `/data` with AOF enabled. Runtime mountpoints were verified under Docker's named-volume storage.
+- Restart-persistence test PASS: SQL migration history remained `7 -> 7`; a Redis persistence marker survived SQL/Redis restart.
+- Fresh database migration PASS: all 7 EF migrations applied successfully to a disposable zero-state database, then the verification database was removed.
+- Seed idempotency PASS across two API restarts: counts stayed `4 Foods | 2 Recipes | 2 DietRules | 1 ChallengeTemplate | 14 ChallengeDayTemplates`.
+- Backup/restore readiness: `scripts/Backup-LocalData.ps1` creates SQL CHECKSUM backup, executes `RESTORE VERIFYONLY`, stores ignored local SQL/Redis snapshots; `scripts/Test-SqlRestore.ps1` restored the verified backup to a disposable database, observed 7 migrations, then removed it. No backup binary is tracked.
+- Runtime readiness tooling: `scripts/Test-ReleaseReadiness.ps1` validates project structure, Compose config, loopback port policy, ignored secrets/backups, API/Web health, Redis PING and named-volume evidence. `scripts/Test-LocalPersistence.ps1` verifies restart persistence.
+- Configuration: `.env.example` contains explicit `CHANGE_ME` placeholders only; `.env` and `.local-backups/` are Git-ignored. API and Worker keep fail-fast checks for required SQL/JWT/Redis configuration.
+- Controlled dependency recovery PASS: with Recommendation gRPC stopped, API `/health` remained HTTP 200; gRPC restarted successfully. Redis stop/start restored to `PING=PONG`; Worker stream logic intentionally avoids ACK on Redis failure.
+- CI: existing quality workflow now includes frontend tests in addition to structure, Compose config, restore/build/.NET test, npm ci/lint/build. Pushes to `main` add `current-runtime-release-smoke`: ephemeral CI-only secrets, Docker build/start, API/Web health, Playwright Chromium Docker E2E, Redis evidence and teardown.
+- Docker E2E PASS after hardening: Playwright `test:docker` 1/1.
+- Release/operations runbook added at `docs/operations/RELEASE-RUNBOOK.md`, covering prerequisites, start/stop/restart, health/logs, migrations/seed, backup/restore, Redis inspection, Worker recovery, dependency failure/restore, secrets, rollback policy, known issues and release-candidate checklist.
+- README release/test baseline updated to current evidence and links to the runbook.
+- Final current-runtime gates: project structure PASS; Compose config PASS; `git diff --check` PASS; EF reports no pending model changes; .NET build 0 warnings / 0 errors; UnitTests 51/51 PASS; frontend tests 6/6 PASS; lint 0 warnings / 0 errors; frontend production build PASS; Docker E2E 1/1 PASS.
+- Full integration suite is `35/38 PASS`. The same three MealLog create failures (`Expected Created`, `Actual InternalServerError`) were reproduced on clean `origin/develop` commit `474b475`; CI is intentionally not weakened or configured to skip them.
+- Target communication matrix remains partially unimplemented by repository architecture: current runtime proves Browser -> Web -> API, API -> gRPC, API/Worker -> SQL, API/Worker -> Redis, Worker Redis Streams and persisted-result visibility. Gateway -> four REST domain services, Worker Ops as separate :8086 deployable, service-owned databases and public TLS :443 remain Target-only and must stay labeled as such.
+- Branch push remains blocked externally: authenticated GitHub account `ThanLeThanhVinh04` receives HTTP 403 when pushing to `YAHsaveme/FPTUSE_LongevityDiet`. Reviewer (Thành viên 4) approval is still required before Done.
