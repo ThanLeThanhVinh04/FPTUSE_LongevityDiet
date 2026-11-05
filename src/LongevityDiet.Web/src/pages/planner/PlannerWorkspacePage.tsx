@@ -846,6 +846,7 @@ export function PlannerWorkspacePage() {
           <a href="#recommendation-v2">Gợi ý & Đổi món v2</a>
           <a href="#meal-logger">Nhật ký bữa ăn</a>
           <a href="#fmd-tracker">Chu kỳ FMD 5 ngày</a>
+          <Link to="/progress">Thử thách & tiến độ</Link>
           <Link to="/">Trang giới thiệu</Link>
         </nav>
 

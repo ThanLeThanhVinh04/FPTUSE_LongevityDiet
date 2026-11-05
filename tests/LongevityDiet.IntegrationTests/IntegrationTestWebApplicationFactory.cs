@@ -1,5 +1,6 @@
 using LongevityDiet.Domain.Entities;
 using LongevityDiet.Repositories;
+using LongevityDiet.Repositories.Seed;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
@@ -63,6 +64,7 @@ public sealed class IntegrationTestWebApplicationFactory : WebApplicationFactory
 
         await dbContext.Database.EnsureDeletedAsync();
         await dbContext.Database.EnsureCreatedAsync();
+        await ChallengeSeed.SeedAsync(dbContext);
     }
 
     public async Task DisableUserAsync(string email)

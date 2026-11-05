@@ -8,6 +8,7 @@ using LongevityDiet.Repositories;
 using LongevityDiet.Repositories.Catalog.Repositories;
 using LongevityDiet.Repositories.Catalog.Seed;
 using LongevityDiet.Repositories.Repositories;
+using LongevityDiet.Repositories.Seed;
 using LongevityDiet.Services.Catalog;
 using LongevityDiet.Services.Identity;
 using LongevityDiet.Services.Fmd;
@@ -70,6 +71,7 @@ try
     builder.Services.AddScoped<IFmdRepository, FmdRepository>();
     builder.Services.AddScoped<IMealLogRepository, MealLogRepository>();
     builder.Services.AddScoped<IEatingWindowRepository, EatingWindowRepository>();
+    builder.Services.AddScoped<IChallengeProgressRepository, ChallengeProgressRepository>();
     builder.Services.AddScoped<IPlanningInputProvider, PlanningCatalogSnapshotProvider>();
     builder.Services.AddScoped<ITrackingUserScheduleProvider, TrackingUserScheduleProvider>();
     builder.Services.AddSingleton<IRecommendationEngineClient, GrpcRecommendationEngineClient>();
@@ -83,6 +85,7 @@ try
     builder.Services.AddScoped<RecommendationService>();
     builder.Services.AddScoped<FmdService>();
     builder.Services.AddScoped<MealTrackingService>();
+    builder.Services.AddScoped<ChallengeProgressService>();
     builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
     builder.Services.AddScoped<IAccessTokenProvider, JwtAccessTokenProvider>();
     builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
@@ -124,6 +127,7 @@ try
         var dbContext = scope.ServiceProvider.GetRequiredService<LongevityDietDbContext>();
         await dbContext.Database.MigrateAsync();
         await CatalogSeed.SeedAsync(dbContext);
+        await ChallengeSeed.SeedAsync(dbContext);
     }
 
     app.UseSerilogRequestLogging();

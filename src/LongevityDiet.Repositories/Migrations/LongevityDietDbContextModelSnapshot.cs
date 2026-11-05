@@ -424,6 +424,121 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("RuleVersions", "catalog");
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.ChallengeDayTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChallengeTemplateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Guidance")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChallengeTemplateId", "DayNumber")
+                        .IsUnique();
+
+                    b.ToTable("ChallengeDayTemplates", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.ChallengeTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<int>("DurationDays")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("ChallengeTemplates", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.DailyWellnessSummary", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ChallengeCurrentStreak")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("ChallengeDayCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("DataAvailability")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<bool?>("EatingWindowWithinTarget")
+                        .HasColumnType("bit");
+
+                    b.Property<DateOnly>("LocalDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("LoggedMealCount")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("LoggingConsistencyScore")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
+
+                    b.Property<int>("TotalCaloriesKcal")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "LocalDate")
+                        .IsUnique();
+
+                    b.ToTable("DailyWellnessSummaries", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.EatingWindowSnapshot", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1152,6 +1267,27 @@ namespace LongevityDiet.Repositories.Migrations
                     b.ToTable("PlannedMeals", (string)null);
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.ProgressEventReceipt", b =>
+                {
+                    b.Property<Guid>("EventId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<DateTimeOffset>("ProcessedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("EventId");
+
+                    b.HasIndex("ProcessedAt");
+
+                    b.ToTable("ProgressEventReceipts", (string)null);
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.RecommendationFeedback", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1292,6 +1428,89 @@ namespace LongevityDiet.Repositories.Migrations
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.UserChallenge", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ChallengeTemplateId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("StartedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
+
+                    b.Property<string>("TimeZone")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChallengeTemplateId");
+
+                    b.HasIndex("UserId", "StartDate");
+
+                    b.HasIndex("UserId", "Status");
+
+                    b.ToTable("UserChallenges", (string)null);
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.UserChallengeDay", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CompletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("DayNumber")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateOnly>("LocalDate")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserChallengeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserChallengeId", "DayNumber")
+                        .IsUnique();
+
+                    b.HasIndex("UserChallengeId", "LocalDate")
+                        .IsUnique();
+
+                    b.ToTable("UserChallengeDays", (string)null);
                 });
 
             modelBuilder.Entity("LongevityDiet.Domain.Entities.UserDietaryPreference", b =>
@@ -1472,6 +1691,17 @@ namespace LongevityDiet.Repositories.Migrations
                     b.Navigation("DietRule");
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.ChallengeDayTemplate", b =>
+                {
+                    b.HasOne("LongevityDiet.Domain.Entities.ChallengeTemplate", "ChallengeTemplate")
+                        .WithMany("Days")
+                        .HasForeignKey("ChallengeTemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChallengeTemplate");
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycleDay", b =>
                 {
                     b.HasOne("LongevityDiet.Domain.Entities.FmdCycle", "FmdCycle")
@@ -1527,6 +1757,28 @@ namespace LongevityDiet.Repositories.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.UserChallenge", b =>
+                {
+                    b.HasOne("LongevityDiet.Domain.Entities.ChallengeTemplate", "ChallengeTemplate")
+                        .WithMany()
+                        .HasForeignKey("ChallengeTemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ChallengeTemplate");
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.UserChallengeDay", b =>
+                {
+                    b.HasOne("LongevityDiet.Domain.Entities.UserChallenge", "UserChallenge")
+                        .WithMany("Days")
+                        .HasForeignKey("UserChallengeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserChallenge");
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.UserProfile", b =>
                 {
                     b.HasOne("LongevityDiet.Domain.Entities.User", "User")
@@ -1575,6 +1827,11 @@ namespace LongevityDiet.Repositories.Migrations
                     b.Navigation("Ingredients");
                 });
 
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.ChallengeTemplate", b =>
+                {
+                    b.Navigation("Days");
+                });
+
             modelBuilder.Entity("LongevityDiet.Domain.Entities.FmdCycle", b =>
                 {
                     b.Navigation("Days");
@@ -1600,6 +1857,11 @@ namespace LongevityDiet.Repositories.Migrations
                     b.Navigation("Profile");
 
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("LongevityDiet.Domain.Entities.UserChallenge", b =>
+                {
+                    b.Navigation("Days");
                 });
 #pragma warning restore 612, 618
         }

@@ -31,6 +31,12 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
     public DbSet<FmdSafetyAssessment> FmdSafetyAssessments => Set<FmdSafetyAssessment>();
     public DbSet<FmdCycle> FmdCycles => Set<FmdCycle>();
     public DbSet<FmdCycleDay> FmdCycleDays => Set<FmdCycleDay>();
+    public DbSet<ChallengeTemplate> ChallengeTemplates => Set<ChallengeTemplate>();
+    public DbSet<ChallengeDayTemplate> ChallengeDayTemplates => Set<ChallengeDayTemplate>();
+    public DbSet<UserChallenge> UserChallenges => Set<UserChallenge>();
+    public DbSet<UserChallengeDay> UserChallengeDays => Set<UserChallengeDay>();
+    public DbSet<DailyWellnessSummary> DailyWellnessSummaries => Set<DailyWellnessSummary>();
+    public DbSet<ProgressEventReceipt> ProgressEventReceipts => Set<ProgressEventReceipt>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -70,6 +76,7 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
         ConfigureTrackingModel(modelBuilder);
         ConfigureRecommendationModel(modelBuilder);
         ConfigureFmdModel(modelBuilder);
+        ConfigureChallengeProgressModel(modelBuilder);
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LongevityDietDbContext).Assembly);
     }
 
@@ -258,5 +265,62 @@ public sealed class LongevityDietDbContext(DbContextOptions<LongevityDietDbConte
         cycleDay.Property(x => x.Symptoms).HasMaxLength(500);
         cycleDay.Property(x => x.DailyNotes).HasMaxLength(1000);
         cycleDay.HasIndex(x => new { x.FmdCycleId, x.DayNumber }).IsUnique();
+    }
+
+    private static void ConfigureChallengeProgressModel(ModelBuilder modelBuilder)
+    {
+        var template = modelBuilder.Entity<ChallengeTemplate>();
+        template.ToTable("ChallengeTemplates");
+        template.HasKey(x => x.Id);
+        template.Property(x => x.Code).HasMaxLength(64).IsRequired();
+        template.Property(x => x.Title).HasMaxLength(200).IsRequired();
+        template.Property(x => x.Description).HasMaxLength(1000).IsRequired();
+        template.HasIndex(x => x.Code).IsUnique();
+        template.HasMany(x => x.Days)
+            .WithOne(x => x.ChallengeTemplate)
+            .HasForeignKey(x => x.ChallengeTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        var templateDay = modelBuilder.Entity<ChallengeDayTemplate>();
+        templateDay.ToTable("ChallengeDayTemplates");
+        templateDay.HasKey(x => x.Id);
+        templateDay.Property(x => x.Title).HasMaxLength(200).IsRequired();
+        templateDay.Property(x => x.Guidance).HasMaxLength(1000).IsRequired();
+        templateDay.HasIndex(x => new { x.ChallengeTemplateId, x.DayNumber }).IsUnique();
+
+        var challenge = modelBuilder.Entity<UserChallenge>();
+        challenge.ToTable("UserChallenges");
+        challenge.HasKey(x => x.Id);
+        challenge.Property(x => x.TimeZone).HasMaxLength(100).IsRequired();
+        challenge.Property(x => x.Status).HasConversion<string>().HasMaxLength(24);
+        challenge.HasIndex(x => new { x.UserId, x.Status });
+        challenge.HasIndex(x => new { x.UserId, x.StartDate });
+        challenge.HasOne(x => x.ChallengeTemplate)
+            .WithMany()
+            .HasForeignKey(x => x.ChallengeTemplateId)
+            .OnDelete(DeleteBehavior.Restrict);
+        challenge.HasMany(x => x.Days)
+            .WithOne(x => x.UserChallenge)
+            .HasForeignKey(x => x.UserChallengeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        var challengeDay = modelBuilder.Entity<UserChallengeDay>();
+        challengeDay.ToTable("UserChallengeDays");
+        challengeDay.HasKey(x => x.Id);
+        challengeDay.HasIndex(x => new { x.UserChallengeId, x.DayNumber }).IsUnique();
+        challengeDay.HasIndex(x => new { x.UserChallengeId, x.LocalDate }).IsUnique();
+
+        var daily = modelBuilder.Entity<DailyWellnessSummary>();
+        daily.ToTable("DailyWellnessSummaries");
+        daily.HasKey(x => x.Id);
+        daily.Property(x => x.LoggingConsistencyScore).HasPrecision(5, 4);
+        daily.Property(x => x.DataAvailability).HasMaxLength(300).IsRequired();
+        daily.HasIndex(x => new { x.UserId, x.LocalDate }).IsUnique();
+
+        var receipt = modelBuilder.Entity<ProgressEventReceipt>();
+        receipt.ToTable("ProgressEventReceipts");
+        receipt.HasKey(x => x.EventId);
+        receipt.Property(x => x.EventType).HasMaxLength(120).IsRequired();
+        receipt.HasIndex(x => x.ProcessedAt);
     }
 }

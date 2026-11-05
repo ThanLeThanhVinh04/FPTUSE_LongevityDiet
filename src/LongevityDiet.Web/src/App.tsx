@@ -26,6 +26,12 @@ const AdminCatalogPage = lazy(() =>
   import('./features/admin/catalog/AdminCatalogPage').then((module) => ({ default: module.AdminCatalogPage })),
 )
 
+const ChallengeDashboardPage = lazy(() =>
+  import('./features/progress/ChallengeDashboardPage').then((module) => ({
+    default: module.ChallengeDashboardPage,
+  })),
+)
+
 const profilePages = () => import('./pages/auth/ProfileEditorPage')
 
 const OnboardingPage = lazy(() =>
@@ -100,6 +106,15 @@ function App() {
           element={
             <ProtectedRoute>
               <CatalogPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/progress"
+          element={
+            <ProtectedRoute>
+              <ChallengeDashboardPage />
             </ProtectedRoute>
           }
         />
